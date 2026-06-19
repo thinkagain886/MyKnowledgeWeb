@@ -1,0 +1,2754 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI 应用 & Agent 开发知识图谱 | Java 工程师进阶</title>
+<style>
+:root {
+  --bg: #0f1117;
+  --bg2: #1a1d27;
+  --bg3: #252836;
+  --border: #2d3048;
+  --accent: #6c63ff;
+  --accent2: #00d4ff;
+  --accent3: #ff6b6b;
+  --accent4: #ffd93d;
+  --accent5: #6bcb77;
+  --text: #e2e8f0;
+  --text2: #94a3b8;
+  --text3: #64748b;
+  --tag-bg: #1e2235;
+  --code-bg: #161925;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { background: var(--bg); color: var(--text); font-family: 'Segoe UI', system-ui, sans-serif; line-height: 1.7; }
+
+/* ── 顶栏 ── */
+.topbar { background: var(--bg2); border-bottom: 1px solid var(--border); padding: 16px 24px; display: flex; align-items: center; gap: 12px; position: sticky; top: 0; z-index: 100; backdrop-filter: blur(8px); }
+.topbar h1 { font-size: 1.1rem; background: linear-gradient(135deg, var(--accent), var(--accent2)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+.topbar .sub { color: var(--text3); font-size: 0.8rem; margin-left: auto; }
+
+/* ── 布局 ── */
+.layout { display: flex; min-height: 100vh; }
+.sidebar { width: 260px; min-width: 260px; background: var(--bg2); border-right: 1px solid var(--border); padding: 20px 0; position: sticky; top: 57px; height: calc(100vh - 57px); overflow-y: auto; }
+.main { flex: 1; padding: 32px; max-width: 1000px; }
+
+/* ── 侧边导航 ── */
+.nav-section { padding: 0 16px 8px; font-size: 0.7rem; color: var(--text3); text-transform: uppercase; letter-spacing: 1px; margin-top: 16px; }
+.nav-item { display: flex; align-items: center; gap: 8px; padding: 8px 16px; cursor: pointer; font-size: 0.88rem; color: var(--text2); transition: all 0.2s; border-left: 2px solid transparent; }
+.nav-item:hover { background: var(--bg3); color: var(--text); }
+.nav-item.active { background: var(--bg3); color: var(--accent); border-left-color: var(--accent); }
+.nav-item .icon { font-size: 1rem; min-width: 20px; }
+
+/* ── 卡片 ── */
+.card { background: var(--bg2); border: 1px solid var(--border); border-radius: 12px; padding: 28px; margin-bottom: 24px; transition: border-color 0.2s; }
+.card:hover { border-color: var(--accent); }
+.card-header { display: flex; align-items: center; gap: 12px; margin-bottom: 20px; }
+.card-icon { font-size: 1.8rem; }
+.card-title { font-size: 1.25rem; font-weight: 600; }
+.card-subtitle { font-size: 0.82rem; color: var(--text3); margin-top: 2px; }
+
+/* ── 三要素块 ── */
+.principle-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin: 16px 0; }
+.principle-box { background: var(--bg3); border-radius: 8px; padding: 14px; border-left: 3px solid var(--accent); }
+.principle-box.p2 { border-left-color: var(--accent2); }
+.principle-box.p3 { border-left-color: var(--accent4); }
+.principle-box.p4 { border-left-color: var(--accent5); }
+.principle-box .label { font-size: 0.7rem; color: var(--text3); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px; }
+.principle-box .value { font-size: 0.9rem; color: var(--text); }
+
+/* ── 代码块 ── */
+pre { background: var(--code-bg); border: 1px solid var(--border); border-radius: 8px; padding: 16px; overflow-x: auto; font-size: 0.82rem; font-family: 'Cascadia Code', 'Fira Code', monospace; margin: 12px 0; }
+code { background: var(--code-bg); padding: 2px 6px; border-radius: 4px; font-size: 0.85rem; color: var(--accent2); }
+
+/* ── 标签 ── */
+.tags { display: flex; flex-wrap: wrap; gap: 6px; margin: 10px 0; }
+.tag { background: var(--tag-bg); border: 1px solid var(--border); border-radius: 20px; padding: 3px 10px; font-size: 0.75rem; color: var(--text2); }
+.tag.hot { border-color: var(--accent3); color: var(--accent3); }
+.tag.new { border-color: var(--accent5); color: var(--accent5); }
+.tag.java { border-color: var(--accent4); color: var(--accent4); }
+
+/* ── 流程图 ── */
+.flow { display: flex; align-items: center; flex-wrap: wrap; gap: 4px; margin: 16px 0; }
+.flow-step { background: var(--bg3); border: 1px solid var(--border); border-radius: 6px; padding: 6px 12px; font-size: 0.82rem; }
+.flow-arrow { color: var(--accent); font-size: 1.1rem; }
+
+/* ── 对比表 ── */
+.compare-table { width: 100%; border-collapse: collapse; font-size: 0.85rem; margin: 16px 0; }
+.compare-table th { background: var(--bg3); padding: 10px 14px; text-align: left; font-size: 0.75rem; color: var(--text3); text-transform: uppercase; letter-spacing: 0.5px; }
+.compare-table td { padding: 10px 14px; border-bottom: 1px solid var(--border); }
+.compare-table tr:last-child td { border-bottom: none; }
+.compare-table tr:hover td { background: var(--bg3); }
+
+/* ── 警告/提示块 ── */
+.alert { border-radius: 8px; padding: 12px 16px; font-size: 0.88rem; margin: 12px 0; display: flex; gap: 10px; }
+.alert.info { background: rgba(108,99,255,0.1); border: 1px solid rgba(108,99,255,0.3); }
+.alert.warn { background: rgba(255,107,107,0.1); border: 1px solid rgba(255,107,107,0.3); }
+.alert.tip { background: rgba(0,212,255,0.1); border: 1px solid rgba(0,212,255,0.3); }
+.alert.success { background: rgba(107,203,119,0.1); border: 1px solid rgba(107,203,119,0.3); }
+
+/* ── 章节标题 ── */
+.section-title { font-size: 1.8rem; font-weight: 700; margin-bottom: 8px; }
+.section-desc { color: var(--text2); font-size: 0.95rem; margin-bottom: 24px; }
+.h2 { font-size: 1.1rem; font-weight: 600; margin: 20px 0 10px; color: var(--accent2); }
+.h3 { font-size: 0.95rem; font-weight: 600; margin: 14px 0 8px; color: var(--accent4); }
+p { color: var(--text2); margin: 8px 0; font-size: 0.9rem; }
+ul, ol { color: var(--text2); font-size: 0.9rem; padding-left: 20px; }
+li { margin: 4px 0; }
+li strong { color: var(--text); }
+
+/* ── 页面切换 ── */
+.page { display: none; }
+.page.active { display: block; }
+
+/* ── 进度条 ── */
+.skill-bar { margin: 8px 0; }
+.skill-label { display: flex; justify-content: space-between; font-size: 0.8rem; color: var(--text2); margin-bottom: 4px; }
+.skill-track { background: var(--bg3); border-radius: 4px; height: 6px; }
+.skill-fill { height: 6px; border-radius: 4px; background: linear-gradient(90deg, var(--accent), var(--accent2)); transition: width 0.8s ease; }
+
+/* ── 双列 ── */
+.grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.grid3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+
+/* ── 高亮框 ── */
+.highlight-box { background: linear-gradient(135deg, rgba(108,99,255,0.1), rgba(0,212,255,0.05)); border: 1px solid rgba(108,99,255,0.3); border-radius: 10px; padding: 16px 20px; margin: 14px 0; }
+
+/* ── 移动端 ── */
+@media (max-width: 768px) {
+  .sidebar { display: none; }
+  .principle-grid, .grid2, .grid3 { grid-template-columns: 1fr; }
+}
+
+.badge { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 0.72rem; font-weight: 600; background: var(--accent); color: white; margin-left: 6px; }
+.badge.red { background: var(--accent3); }
+.badge.green { background: var(--accent5); }
+.badge.yellow { background: var(--accent4); color: #000; }
+
+/* ── 知识点块 ── */
+.kp-block { background: var(--bg3); border-radius: 8px; padding: 16px; margin: 12px 0; border-left: 3px solid var(--accent); }
+.kp-block.kp2 { border-left-color: var(--accent2); }
+.kp-block.kp3 { border-left-color: var(--accent4); }
+.kp-block.kp4 { border-left-color: var(--accent5); }
+.kp-row { display: grid; grid-template-columns: 100px 1fr; gap: 10px; margin: 8px 0; font-size: 0.88rem; align-items: start; }
+.kp-label { color: var(--accent2); font-weight: 600; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.5px; padding-top: 2px; }
+.kp-label.warn { color: var(--accent3); }
+.kp-label.tip { color: var(--accent5); }
+.kp-label.demo { color: var(--accent4); }
+.kp-num { display: inline-flex; align-items: center; justify-content: center; width: 24px; height: 24px; border-radius: 50%; background: var(--accent); color: white; font-size: 0.75rem; font-weight: 700; margin-right: 8px; flex-shrink: 0; }
+.toc-links { display: flex; flex-wrap: wrap; gap: 6px; margin: 12px 0; }
+.toc-link { background: var(--bg3); border: 1px solid var(--border); border-radius: 6px; padding: 4px 10px; font-size: 0.78rem; color: var(--text2); cursor: pointer; transition: all 0.2s; text-decoration: none; }
+.toc-link:hover { border-color: var(--accent); color: var(--accent); }
+.project-box { background: rgba(107,203,119,0.08); border: 1px solid rgba(107,203,119,0.35); border-radius: 8px; padding: 14px 16px; margin: 12px 0; }
+.project-box .proj-title { font-size: 0.78rem; color: var(--accent5); font-weight: 700; margin-bottom: 8px; letter-spacing: 0.5px; }
+.glossary-cat { font-size: 0.95rem; font-weight: 700; color: var(--accent); margin: 20px 0 10px; padding-bottom: 6px; border-bottom: 1px solid var(--border); }
+.step-box { background: var(--bg3); border-radius: 8px; padding: 14px; margin: 10px 0; border-left: 3px solid var(--accent5); }
+.step-box .step-num { color: var(--accent5); font-weight: 700; font-size: 0.8rem; }
+.detail-flow { display: flex; align-items: center; flex-wrap: wrap; gap: 6px; margin: 14px 0; padding: 14px; background: var(--bg3); border-radius: 8px; }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <span style="font-size:1.4rem">🧠</span>
+  <h1>AI 应用 & Agent 开发知识图谱</h1>
+  <span class="sub">Java工程师 AI 转型 · 第一性原理 · 2025版</span>
+</div>
+
+<div class="layout">
+<!-- ══ 侧边栏 ══ -->
+<nav class="sidebar">
+  <div class="nav-section">核心概念</div>
+  <div class="nav-item" onclick="showPage('job-direction')"><span class="icon">🎯</span>岗位方向选择</div>
+  <div class="nav-item active" onclick="showPage('overview')"><span class="icon">🗺️</span>全局导图</div>
+  <div class="nav-item" onclick="showPage('llm')"><span class="icon">🤖</span>LLM 基础原理</div>
+  <div class="nav-item" onclick="showPage('prompt')"><span class="icon">✍️</span>Prompt 工程</div>
+  <div class="nav-item" onclick="showPage('rag')"><span class="icon">📚</span>RAG 检索增强</div>
+  <div class="nav-item" onclick="showPage('tools')"><span class="icon">🔧</span>Tool Calling</div>
+  <div class="nav-item" onclick="showPage('memory')"><span class="icon">🧠</span>记忆系统</div>
+
+  <div class="nav-section">Java AI 框架</div>
+  <div class="nav-item" onclick="showPage('springai')"><span class="icon">☕</span>Spring AI</div>
+  <div class="nav-item" onclick="showPage('springai-alibaba')"><span class="icon">☁️</span>Spring AI Alibaba</div>
+  <div class="nav-item" onclick="showPage('langchain4j')"><span class="icon">⛓️</span>LangChain4j</div>
+
+  <div class="nav-section">Agent 开发</div>
+  <div class="nav-item" onclick="showPage('agent-intro')"><span class="icon">🤖</span>Agent 是什么</div>
+  <div class="nav-item" onclick="showPage('react')"><span class="icon">🔄</span>ReAct Agent</div>
+  <div class="nav-item" onclick="showPage('multi-agent')"><span class="icon">👥</span>Multi-Agent</div>
+  <div class="nav-item" onclick="showPage('agent-pattern')"><span class="icon">🏗️</span>Agent 设计模式</div>
+
+  <div class="nav-section">Vibe Coding</div>
+  <div class="nav-item" onclick="showPage('cursor')"><span class="icon">🖱️</span>Cursor</div>
+  <div class="nav-item" onclick="showPage('claude-code')"><span class="icon">⚡</span>Claude Code</div>
+  <div class="nav-item" onclick="showPage('vibe-flow')"><span class="icon">🌊</span>AI 驱动开发流程</div>
+
+  <div class="nav-section">企业级能力</div>
+  <div class="nav-item" onclick="showPage('skills')"><span class="icon">🎯</span>Skills 技能系统</div>
+  <div class="nav-item" onclick="showPage('harness')"><span class="icon">🏋️</span>Harness 执行框架</div>
+  <div class="nav-item" onclick="showPage('mcp')"><span class="icon">🔌</span>MCP 协议</div>
+  <div class="nav-item" onclick="showPage('rag-enterprise')"><span class="icon">🏢</span>企业级 RAG · 咔咔快</div>
+
+  <div class="nav-section">实战场景</div>
+  <div class="nav-item" onclick="showPage('customer-service')"><span class="icon">💬</span>智能客服系统</div>
+  <div class="nav-item" onclick="showPage('interview')"><span class="icon">🎤</span>面试知识点</div>
+</nav>
+
+<!-- ══ 主内容 ══ -->
+<main class="main">
+
+<!-- ==================== 岗位方向选择 ==================== -->
+<div id="page-job-direction" class="page">
+<div class="section-title">🎯 岗位方向选择</div>
+<div class="section-desc">Java 工程师转型 AI — 三大核心方向全景对比</div>
+
+<div class="card">
+  <div class="card-header">
+    <span class="card-icon">🧭</span>
+    <div><div class="card-title">三大 AI 岗位方向对比</div><div class="card-subtitle">基于你的 10 年 Java 背景，三个方向均高度适配</div></div>
+  </div>
+  <div class="alert success">✅ <strong>核心结论：</strong>你的 Java 微服务 + 支付 + RAG 实战经验，在 AI 岗位中属于稀缺组合。大模型应用开发是最快落地方向，Agent 是最高薪资方向，RAG 工程师是最容易切入方向。</div>
+  <div style="overflow-x:auto;margin-top:16px">
+  <table class="compare-table" style="min-width:900px">
+    <tr>
+      <th style="min-width:130px">岗位方向</th>
+      <th style="min-width:160px">核心做什么</th>
+      <th style="min-width:150px">典型业务场景</th>
+      <th style="min-width:200px">核心技术要求</th>
+      <th>岗位门槛</th>
+      <th>市场机会</th>
+      <th style="min-width:100px">Java 适配度</th>
+      <th style="min-width:160px">转型核心抓手</th>
+    </tr>
+    <tr>
+      <td><strong style="color:var(--accent)">大模型应用开发工程师</strong><br><span style="font-size:0.78rem;color:var(--text3)">(AI 应用开发)</span><span class="badge">需求最大</span></td>
+      <td>基于大模型 API / 开源模型，开发企业级 AI 业务应用</td>
+      <td>智能客服、代码助手、智能文档分析、AI 业务流程自动化</td>
+      <td>Spring AI、LangChain4j、RAG 技术、向量数据库 (Milvus/FAISS)、大模型 API 对接、微服务架构</td>
+      <td><span style="color:var(--accent5)">一般</span></td>
+      <td><span style="color:var(--accent5)">⭐⭐⭐⭐⭐ 极高</span></td>
+      <td>⭐⭐⭐⭐⭐<br><span style="font-size:0.75rem;color:var(--accent5)">核心适配</span></td>
+      <td>100% 匹配 Java 技术栈，Spring AI 是核心竞争力，直接对接企业 AI 落地需求</td>
+    </tr>
+    <tr>
+      <td><strong style="color:var(--accent2)">AI Agent 研发工程师</strong><br><span style="font-size:0.78rem;color:var(--text3)">(智能体)</span><span class="badge red">最高薪</span></td>
+      <td>开发能自主思考、任务拆解、工具调用的 AI 智能系统</td>
+      <td>自动化办公智能体、代码生成智能体、运维自动化、多智能体协作</td>
+      <td>Agent 核心架构 (规划/记忆/工具调用/反馈循环)、LangChain4j/Spring AI Agent、RAG、Function Calling</td>
+      <td><span style="color:var(--accent4)">较高</span></td>
+      <td><span style="color:var(--accent2)">⭐⭐⭐⭐⭐ 高</span></td>
+      <td>⭐⭐⭐⭐⭐<br><span style="font-size:0.75rem;color:var(--accent2)">极高适配</span></td>
+      <td>完全适配 Java 后端架构经验，Spring AI Agent 是 Java 专属核心工具，可复用微服务/分布式能力</td>
+    </tr>
+    <tr>
+      <td><strong style="color:var(--accent4)">私有知识库 / RAG 工程师</strong><br><span style="font-size:0.78rem;color:var(--text3)">(知识系统)</span><span class="badge green">最易切入</span></td>
+      <td>搭建企业专属 AI 知识系统，将内部文档转化为精准知识库</td>
+      <td>企业内部智能问答、员工培训助手、行业知识库、智能客服</td>
+      <td>RAG 全流程 (数据处理/Embedding/检索/生成优化)、向量数据库、Prompt 工程、Spring AI 向量存储</td>
+      <td><span style="color:var(--accent5)">一般</span></td>
+      <td><span style="color:var(--accent5)">⭐⭐⭐⭐⭐ 极高</span></td>
+      <td>⭐⭐⭐⭐<br><span style="font-size:0.75rem;color:var(--accent4)">高适配</span></td>
+      <td>Java 后端经验可快速对接企业系统，补充 RAG 流程和向量库实操即可，落地周期短</td>
+    </tr>
+  </table>
+  </div>
+</div>
+
+<div class="grid3">
+  <div class="card">
+    <div class="card-header"><span class="card-icon">🚀</span><div><div class="card-title" style="color:var(--accent)">大模型应用开发</div><div class="card-subtitle">推荐优先级 ★★★★★</div></div></div>
+    <div class="h3">核心技术栈</div>
+    <div class="tags">
+      <span class="tag java">Spring AI</span><span class="tag java">LangChain4j</span><span class="tag hot">RAG</span>
+      <span class="tag">向量数据库</span><span class="tag">Prompt Engineering</span><span class="tag new">Tool Calling</span>
+    </div>
+    <div class="h3">你的差距</div>
+    <div class="alert success" style="margin:8px 0;font-size:0.82rem">✅ 差距最小，你已有 RAG 实战项目</div>
+    <div class="h3">薪资范围</div>
+    <p>15K-35K，一线城市 20K-45K</p>
+    <div class="h3">面试重点</div>
+    <ul>
+      <li>RAG 全流程实现与优化</li>
+      <li>Spring AI ChatClient + Advisor 使用</li>
+      <li>Prompt 模板设计</li>
+      <li>向量检索精度调优</li>
+    </ul>
+  </div>
+  <div class="card">
+    <div class="card-header"><span class="card-icon">🤖</span><div><div class="card-title" style="color:var(--accent2)">AI Agent 研发</div><div class="card-subtitle">推荐优先级 ★★★★★</div></div></div>
+    <div class="h3">核心技术栈</div>
+    <div class="tags">
+      <span class="tag hot">ReAct Agent</span><span class="tag hot">Multi-Agent</span><span class="tag java">Spring AI Agent</span>
+      <span class="tag">Tool Calling</span><span class="tag new">MCP</span><span class="tag">工作流编排</span>
+    </div>
+    <div class="h3">你的差距</div>
+    <div class="alert tip" style="margin:8px 0;font-size:0.82rem">💡 需补充 Agent Loop 设计和框架实操</div>
+    <div class="h3">薪资范围</div>
+    <p>20K-50K，稀缺岗位溢价明显</p>
+    <div class="h3">面试重点</div>
+    <ul>
+      <li>ReAct 思考循环机制</li>
+      <li>Agent 记忆与工具调用设计</li>
+      <li>Multi-Agent 协作架构</li>
+      <li>吴恩达四大设计模式</li>
+    </ul>
+  </div>
+  <div class="card">
+    <div class="card-header"><span class="card-icon">📚</span><div><div class="card-title" style="color:var(--accent4)">RAG / 知识库工程师</div><div class="card-subtitle">推荐优先级 ★★★★</div></div></div>
+    <div class="h3">核心技术栈</div>
+    <div class="tags">
+      <span class="tag hot">RAG 优化</span><span class="tag">Embedding</span><span class="tag java">Spring AI VectorStore</span>
+      <span class="tag">Milvus</span><span class="tag">Reranker</span><span class="tag">文档解析</span>
+    </div>
+    <div class="h3">你的差距</div>
+    <div class="alert success" style="margin:8px 0;font-size:0.82rem">✅ 已有咔咔快 RAG 项目，直接可讲</div>
+    <div class="h3">薪资范围</div>
+    <p>15K-30K，企业需求量极大</p>
+    <div class="h3">面试重点</div>
+    <ul>
+      <li>文档切片策略选择</li>
+      <li>向量检索 + 关键词混合检索</li>
+      <li>HyDE、Reranker 优化技术</li>
+      <li>知识库质量评估方法</li>
+    </ul>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-header"><span class="card-icon">🗺️</span><div class="card-title">知识栈学习路径</div></div>
+  <div class="grid2">
+    <div>
+      <div class="h2">📌 通用基础（三个方向都要掌握）</div>
+      <div class="flow">
+        <div class="flow-step">LLM 原理</div><div class="flow-arrow">→</div>
+        <div class="flow-step">Prompt 工程</div><div class="flow-arrow">→</div>
+        <div class="flow-step">RAG 全流程</div><div class="flow-arrow">→</div>
+        <div class="flow-step">Tool Calling</div>
+      </div>
+      <div class="h2">🎯 大模型应用开发专项</div>
+      <div class="flow">
+        <div class="flow-step">Spring AI</div><div class="flow-arrow">→</div>
+        <div class="flow-step">ChatClient</div><div class="flow-arrow">→</div>
+        <div class="flow-step">Advisor</div><div class="flow-arrow">→</div>
+        <div class="flow-step">向量数据库</div>
+      </div>
+      <div class="h2">🤖 Agent 研发专项</div>
+      <div class="flow">
+        <div class="flow-step">ReAct 原理</div><div class="flow-arrow">→</div>
+        <div class="flow-step">记忆系统</div><div class="flow-arrow">→</div>
+        <div class="flow-step">Multi-Agent</div><div class="flow-arrow">→</div>
+        <div class="flow-step">MCP</div>
+      </div>
+    </div>
+    <div>
+      <div class="h2">⏱️ 推荐学习时间分配</div>
+      <div class="skill-bar"><div class="skill-label"><span>LLM 基础 + Prompt</span><span>1 周</span></div><div class="skill-track"><div class="skill-fill" style="width:30%"></div></div></div>
+      <div class="skill-bar"><div class="skill-label"><span>Spring AI + RAG 实操</span><span>2 周</span></div><div class="skill-track"><div class="skill-fill" style="width:60%"></div></div></div>
+      <div class="skill-bar"><div class="skill-label"><span>Agent 架构 + 实战</span><span>2 周</span></div><div class="skill-track"><div class="skill-fill" style="width:60%"></div></div></div>
+      <div class="skill-bar"><div class="skill-label"><span>企业级能力 (Skills/MCP)</span><span>1 周</span></div><div class="skill-track"><div class="skill-fill" style="width:30%"></div></div></div>
+      <div class="skill-bar"><div class="skill-label"><span>面试准备 + 项目梳理</span><span>1 周</span></div><div class="skill-track"><div class="skill-fill" style="width:30%"></div></div></div>
+      <div class="alert info" style="margin-top:12px">ℹ️ 总计约 <strong>7 周</strong>，你已有 RAG 实战基础可缩短到 <strong>4-5 周</strong></div>
+    </div>
+  </div>
+</div>
+</div>
+<!-- ==================== END 岗位方向 ==================== -->
+
+<!-- ==================== 全局导图 ==================== -->
+<div id="page-overview" class="page active">
+<div class="section-title">🗺️ 全局知识导图</div>
+<div class="section-desc">从 Java 老手到 AI 应用工程师 — 系统化学习路径</div>
+
+<div class="card">
+  <div class="card-header">
+    <span class="card-icon">🎯</span>
+    <div><div class="card-title">你的优势 & 转型方向</div><div class="card-subtitle">10年Java + 支付/IoT经验，AI方向价值极高</div></div>
+  </div>
+  <div class="grid2">
+    <div class="highlight-box">
+      <div class="h3">✅ 已有优势</div>
+      <ul>
+        <li>Spring 生态深度理解 → Spring AI 无缝衔接</li>
+        <li>微服务架构经验 → Multi-Agent 天然对应</li>
+        <li>RAG 实际项目经验（智能客服）</li>
+        <li>MQ 异步解耦 → Agent 工具调用模式一致</li>
+        <li>支付安全意识 → AI 应用安全设计</li>
+      </ul>
+    </div>
+    <div class="highlight-box">
+      <div class="h3">🚀 需要补充</div>
+      <ul>
+        <li>LLM 原理（Token、上下文窗口、Temperature）</li>
+        <li>Prompt Engineering 系统方法</li>
+        <li>Agent Loop 设计模式（ReAct、Plan-Execute）</li>
+        <li>向量检索优化（Embedding、Rerank）</li>
+        <li>Skills/Harness 企业级 Agent 框架</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-header"><span class="card-icon">🗃️</span><div class="card-title">知识体系全景</div></div>
+  <div class="principle-grid">
+    <div class="principle-box">
+      <div class="label">第一层 · 基础</div>
+      <div class="value">LLM原理 → Prompt工程 → Tool Calling → 记忆系统</div>
+    </div>
+    <div class="principle-box p2">
+      <div class="label">第二层 · 框架</div>
+      <div class="value">Spring AI · LangChain4j · Spring AI Alibaba</div>
+    </div>
+    <div class="principle-box p3">
+      <div class="label">第三层 · Agent</div>
+      <div class="value">ReAct · Plan-Execute · Multi-Agent · 设计模式</div>
+    </div>
+    <div class="principle-box p4">
+      <div class="label">第四层 · 工程化</div>
+      <div class="value">RAG优化 · 记忆管理 · 工具注册 · 可观测性</div>
+    </div>
+    <div class="principle-box">
+      <div class="label">第五层 · 企业级</div>
+      <div class="value">Skills · Harness · MCP · Vibe Coding</div>
+    </div>
+    <div class="principle-box p2">
+      <div class="label">第六层 · 实战</div>
+      <div class="value">智能客服 · 代码 Agent · 数据分析 · 流程自动化</div>
+    </div>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-header"><span class="card-icon">📅</span><div class="card-title">学习优先级路线</div></div>
+  <div class="flow">
+    <div class="flow-step" style="border-color:var(--accent3)">Week1<br/>LLM基础+Prompt</div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step" style="border-color:var(--accent4)">Week2<br/>Spring AI实战</div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step" style="border-color:var(--accent2)">Week3<br/>RAG+Tool Calling</div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step" style="border-color:var(--accent5)">Week4<br/>ReAct Agent</div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step" style="border-color:var(--accent)">Week5+<br/>Multi-Agent+企业级</div>
+  </div>
+  <div class="alert info">💡 <span>你已有 RAG 实战经验，Week3 可以快速通过，重点放在 Week4-5 的 Agent 架构设计。</span></div>
+</div>
+</div>
+<!-- ==================== END 全局导图 ==================== -->
+
+<!-- ==================== LLM 基础原理 ==================== -->
+<div id="page-llm" class="page">
+<div class="section-title">🤖 LLM 基础原理</div>
+<div class="section-desc">第一性原理：LLM 解决什么问题？原理是什么？</div>
+
+<div class="card">
+  <div class="card-header"><span class="card-icon">❓</span><div class="card-title">解决什么问题？</div></div>
+  <p>传统程序只能处理规则明确的结构化任务。LLM 解决了「用自然语言理解和生成人类意图」的问题——让机器能理解模糊的、上下文依赖的、创造性的指令，并给出流畅的回应。</p>
+  <div class="principle-grid">
+    <div class="principle-box"><div class="label">问题</div><div class="value">自然语言理解与生成</div></div>
+    <div class="principle-box p2"><div class="label">核心能力</div><div class="value">上下文推理 + 知识检索 + 格式生成</div></div>
+    <div class="principle-box p3"><div class="label">本质</div><div class="value">下一个 Token 概率预测器</div></div>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-header"><span class="card-icon">⚙️</span><div class="card-title">核心概念速查</div></div>
+  <table class="compare-table">
+    <tr><th>概念</th><th>含义</th><th>实际影响</th></tr>
+    <tr><td><strong>Token</strong></td><td>LLM 处理的最小单位，约 0.75 个中文字 / 1 英文单词</td><td>影响成本和速度</td></tr>
+    <tr><td><strong>上下文窗口</strong></td><td>模型一次能处理的最大 Token 数（如 128K）</td><td>决定能传多少历史</td></tr>
+    <tr><td><strong>Temperature</strong></td><td>控制随机性，0=确定性，1=创意，>1=混乱</td><td>代码用 0，创作用 0.7</td></tr>
+    <tr><td><strong>Top-P</strong></td><td>采样范围（nucleus sampling），配合 Temperature</td><td>一般设 0.9-0.95</td></tr>
+    <tr><td><strong>System Prompt</strong></td><td>角色设定和约束，在对话前注入</td><td>定义模型行为边界</td></tr>
+    <tr><td><strong>Few-Shot</strong></td><td>在 Prompt 中给示例引导输出格式</td><td>格式稳定性大幅提升</td></tr>
+    <tr><td><strong>Hallucination</strong></td><td>模型编造不存在的事实</td><td>必须用 RAG 或 Grounding</td></tr>
+  </table>
+</div>
+
+<div class="card">
+  <div class="card-header"><span class="card-icon">💡</span><div class="card-title">关键工程注意点</div></div>
+  <div class="alert warn">⚠️ <strong>幻觉问题：</strong>模型不知道「不知道」，会编造答案。解法：RAG注入事实 + 要求模型引用来源 + 低Temperature</div>
+  <div class="alert tip">💡 <strong>上下文管理：</strong>超过窗口就会「遗忘」早期内容。解法：滑动窗口 + 摘要压缩 + 向量记忆</div>
+  <div class="alert info">ℹ️ <strong>成本控制：</strong>Token = 钱。System Prompt 越短越好，用 Cache 复用高频内容</div>
+  <div class="alert success">✅ <strong>确定性输出：</strong>生产环境 Temperature 设 0，需要 JSON 时在 Prompt 里强制约束格式</div>
+</div>
+</div>
+<!-- ==================== END LLM ==================== -->
+
+<!-- ==================== Prompt 工程 ==================== -->
+<div id="page-prompt" class="page">
+<div class="section-title">✍️ Prompt Engineering</div>
+<div class="section-desc">第一性原理：Prompt 是与 LLM 沟通的编程语言</div>
+
+<div class="card">
+  <div class="card-header"><span class="card-icon">❓</span><div class="card-title">解决什么问题？</div></div>
+  <p>同一个模型，用不同的 Prompt 能得到截然不同的结果。Prompt Engineering 解决「如何精确表达意图、约束输出、引导推理」的问题。本质是：<strong>把需求翻译成模型能最好理解的指令形式</strong>。</p>
+</div>
+
+<div class="card">
+  <div class="card-header"><span class="card-icon">🔑</span><div class="card-title">六大核心技巧</div></div>
+  <div class="h2">1. 角色设定（Role Prompting）</div>
+  <pre>你是一个有10年支付系统经验的Java架构师，专注于高并发和金融安全。
+请从架构角度评审以下代码...</pre>
+  <p>角色越具体，输出越专业。加上「专注于xxx」约束输出方向。</p>
+
+  <div class="h2">2. 思维链（Chain-of-Thought）</div>
+  <pre># 方式1：直接触发
+请一步步分析这个问题...
+
+# 方式2：Few-Shot CoT（给出推理示例）
+问题：A+B=?  分析：A=1,B=2，所以 A+B=3。
+问题：[你的问题]  分析：</pre>
+  <p>复杂推理任务必加，分析类准确率提升 30%+。</p>
+
+  <div class="h2">3. 输出格式约束</div>
+  <pre>请以以下JSON格式返回，不要包含其他内容：
+{
+  "intent": "用户意图",
+  "confidence": 0.0-1.0,
+  "action": "建议动作"
+}</pre>
+  <p>生产环境必须约束格式，配合 Temperature=0 使用。</p>
+
+  <div class="h2">4. 少样本示例（Few-Shot）</div>
+  <pre>示例1：输入"我要充值" → 意图：充值
+示例2：输入"我的网络很慢" → 意图：网络问题
+示例3：输入"怎么实名" → 意图：实名认证
+现在请判断：输入"我要买套餐" → 意图：</pre>
+
+  <div class="h2">5. 负向约束（告诉模型不要做什么）</div>
+  <pre>注意：
+- 不要编造不确定的信息
+- 不要回答与[业务领域]无关的问题
+- 如果不知道，请说"我不确定，建议联系人工客服"</pre>
+  <div class="alert warn">⚠️ 负向约束往往比正向更有效，明确边界防止幻觉</div>
+
+  <div class="h2">6. 上下文注入（RAG + Prompt）</div>
+  <pre>基于以下知识回答用户问题，如果知识中没有答案，回复"超出我的知识范围"。
+
+知识库内容：
+{retrieved_context}
+
+用户问题：{user_question}</pre>
+</div>
+
+<div class="card">
+  <div class="card-header"><span class="card-icon">🏗️</span><div class="card-title">System Prompt 模板（客服场景）</div></div>
+  <pre>你是"咔咔快随身WiFi"的智能客服助手。
+
+## 身份
+专业、友善、简洁地回答用户关于随身WiFi的问题。
+
+## 能力范围
+- 实名认证流程指导
+- 套餐查询与购买
+- 网络故障排查
+- 充值与退款
+
+## 回答规则
+1. 回答控制在100字以内
+2. 遇到无法解决的问题，引导用户拨打客服电话
+3. 不回答与随身WiFi无关的问题
+4. 回答要有温度，不要冷冰冰
+
+## 知识库
+{rag_context}</pre>
+</div>
+</div>
+<!-- ==================== END Prompt ==================== -->
+
+<!-- ==================== RAG ==================== -->
+<div id="page-rag" class="page">
+<div class="section-title">📚 RAG 检索增强生成</div>
+<div class="section-desc">第一性原理：LLM 不会「查资料」，RAG 让它先检索再回答</div>
+
+<div class="card">
+  <div class="card-header"><span class="card-icon">🧬</span><div class="card-title">第一性原理：RAG 解决什么问题？</div></div>
+  <div class="principle-grid">
+    <div class="principle-box"><div class="label">根本矛盾</div><div class="value">LLM 知识 = 训练数据快照，截止后无法感知企业私有文档</div></div>
+    <div class="principle-box p2"><div class="label">核心解法</div><div class="value">不修改模型权重，检索外部知识 → 注入 Prompt → 基于事实生成</div></div>
+    <div class="principle-box p3"><div class="label">类比</div><div class="value">开卷考试：模型是考生，向量库是书架，RAG 是「翻书找答案再写」</div></div>
+  </div>
+  <table class="compare-table" style="margin-top:16px">
+    <tr><th>方案</th><th>适用场景</th><th>局限</th></tr>
+    <tr><td><strong>纯 Prompt</strong></td><td>通用知识问答</td><td>无法回答私有数据，易幻觉</td></tr>
+    <tr><td><strong>微调 Fine-tuning</strong></td><td>固定领域、风格固化</td><td>成本高、更新慢、无法引用最新文档</td></tr>
+    <tr><td><strong>RAG</strong></td><td>企业知识库、客服 FAQ、规章制度</td><td>依赖检索质量，需工程化优化</td></tr>
+  </table>
+  <div class="alert info">💡 企业级知识库系统的本质：<strong>代码写得好不如数据洗得好</strong>——检索精度 80% 取决于分片和 Embedding，20% 才是 Prompt 和模型。</div>
+</div>
+
+<div class="card">
+  <div class="card-header"><span class="card-icon">🔄</span><div class="card-title">RAG 完整流程（两阶段）</div></div>
+  <div class="h2">阶段一：Indexing（离线建库）</div>
+  <div class="flow">
+    <div class="flow-step">原始文档<br/>PDF/Word/Excel</div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step">文档解析<br/>Tika Reader</div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step">分片 Chunking<br/>策略可选</div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step">Embedding<br/>向量化</div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step">Milvus<br/>+ Metadata</div>
+  </div>
+  <div class="h2">阶段二：Retrieval + Generation（在线问答）</div>
+  <div class="flow">
+    <div class="flow-step">用户提问</div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step">Query 向量化</div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step">Metadata 过滤<br/>缩小范围</div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step">Top-K 相似检索</div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step">(可选) Rerank</div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step">拼 Prompt + LLM</div>
+  </div>
+  <div class="alert tip">📌 Spring AI 中 <code>vectorStore.add()</code> 和 <code>QuestionAnswerAdvisor</code> 已封装 Embedding 与检索，开发者重点在<strong>分片策略、Metadata、召回优化</strong>。</div>
+</div>
+
+<div class="card">
+  <div class="card-header"><span class="card-icon">☕</span><div class="card-title">Spring AI 最小实现</div></div>
+  <pre>// Indexing：Tika 读取 → TokenTextSplitter 分片 → Milvus 存储
+List&lt;Document&gt; docs = new TikaDocumentReader(resource).get();
+docs = tokenTextSplitter.apply(docs);
+vectorStore.add(docs);  // 内部自动调用 EmbeddingModel.embed()
+
+// Retrieval：Advisor 自动检索 + 注入 Prompt
+chatClient.prompt()
+    .advisors(new QuestionAnswerAdvisor(vectorStore,
+        SearchRequest.builder()
+            .query(userMessage)
+            .topK(5)
+            .similarityThreshold(0.5)
+            .build()))
+    .user(userMessage)
+    .call()
+    .content();</pre>
+  <div class="alert success">✅ 详细讲解（名词表、咔咔快客服案例、17 知识点+代码、面试题）见 → <strong>侧边栏「企业级 RAG · 咔咔快」</strong></div>
+</div>
+</div>
+<!-- ==================== END RAG ==================== -->
+
+<!-- ==================== Tool Calling ==================== -->
+<div id="page-tools" class="page">
+<div class="section-title">🔧 Tool Calling / Function Calling</div>
+<div class="section-desc">第一性原理：让 LLM 具备执行能力，不只是说，还能做</div>
+
+<div class="card">
+  <div class="card-header"><span class="card-icon">❓</span><div class="card-title">解决什么问题？</div></div>
+  <p>LLM 只能生成文字，无法查数据库、调 API、发邮件。Tool Calling 解决「LLM 的执行能力」问题——让模型决定「该调用哪个工具、传什么参数」，由代码层执行并把结果返回给模型，形成完整的推理-执行闭环。</p>
+</div>
+
+<div class="card">
+  <div class="card-header"><span class="card-icon">🔄</span><div class="card-title">执行流程</div></div>
+  <div class="flow">
+    <div class="flow-step">用户提问</div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step">LLM 判断<br/>需要调用工具</div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step">输出工具调用<br/>指令(JSON)</div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step">代码层<br/>执行工具</div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step">结果回传<br/>LLM</div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step">最终回答</div>
+  </div>
+  <div class="alert info">💡 模型不执行工具，只"决策"调用什么。执行权在你的代码层，这是安全边界的关键！</div>
+</div>
+
+<div class="card">
+  <div class="card-header"><span class="card-icon">☕</span><div class="card-title">Spring AI Tool Calling 实现</div></div>
+  <pre>// 定义工具（Spring AI 用 @Tool 注解）
+@Component
+public class OrderTools {
+
+    @Tool(description = "查询用户的套餐信息，需要用户手机号")
+    public PackageInfo queryPackage(String phone) {
+        // 调用真实业务接口
+        return orderService.getPackageByPhone(phone);
+    }
+
+    @Tool(description = "查询流量使用情况")
+    public TrafficInfo queryTraffic(String phone) {
+        return trafficService.getUsage(phone);
+    }
+}
+
+// 在 ChatClient 中注册工具
+@Service
+public class SmartAssistant {
+    public String chat(String userMessage) {
+        return chatClient.prompt()
+            .user(userMessage)
+            .tools(new OrderTools())  // 注册工具
+            .call()
+            .content();
+    }
+}</pre>
+  <div class="alert tip">💡 工具描述（description）质量直接决定 LLM 调用准确率，要写清楚「什么时候用」「需要什么参数」</div>
+</div>
+
+<div class="card">
+  <div class="card-header"><span class="card-icon">⚠️</span><div class="card-title">注意事项</div></div>
+  <ul>
+    <li><strong>参数校验：</strong>LLM 可能传错类型或缺参，工具层必须做防御性校验</li>
+    <li><strong>权限控制：</strong>工具不应该暴露危险操作（删除/转账），必须有权限检查</li>
+    <li><strong>幂等性：</strong>LLM 可能重复调用同一工具，写操作工具必须幂等</li>
+    <li><strong>超时处理：</strong>工具调用要有超时，避免 Agent 卡死等待</li>
+    <li><strong>错误返回：</strong>工具失败要返回明确错误信息，而不是抛异常</li>
+  </ul>
+</div>
+</div>
+<!-- ==================== END Tool Calling ==================== -->
+
+<!-- ==================== 记忆系统 ==================== -->
+<div id="page-memory" class="page">
+<div class="section-title">🧠 AI 记忆系统</div>
+<div class="section-desc">第一性原理：让 AI 记住过去，才能有连贯的智能</div>
+
+<div class="card">
+  <div class="card-header"><span class="card-icon">❓</span><div class="card-title">解决什么问题？</div></div>
+  <p>LLM 无状态，每次对话都从零开始。记忆系统解决「跨对话持续性」问题——让 Agent 记住用户偏好、历史行为、重要信息，像真正的助手而不是每次失忆的机器。</p>
+</div>
+
+<div class="card">
+  <div class="card-header"><span class="card-icon">🗂️</span><div class="card-title">四种记忆类型</div></div>
+  <div class="principle-grid" style="grid-template-columns:repeat(2,1fr)">
+    <div class="principle-box">
+      <div class="label">短期记忆（Sensory/Buffer）</div>
+      <div class="value">当前对话的上下文窗口内。滑动窗口保留最近 N 轮，超出就丢。实现：ChatMemory</div>
+    </div>
+    <div class="principle-box p2">
+      <div class="label">长期记忆（Long-term）</div>
+      <div class="value">持久化到外部存储（Redis/DB/向量库）。对话结束后提取关键信息写入，下次检索注入。</div>
+    </div>
+    <div class="principle-box p3">
+      <div class="label">情节记忆（Episodic）</div>
+      <div class="value">存储具体事件序列（"用户上次充值了100元"）。时间线索检索，还原事件上下文。</div>
+    </div>
+    <div class="principle-box p4">
+      <div class="label">语义记忆（Semantic）</div>
+      <div class="value">存储抽象知识和用户画像（"该用户偏好流量套餐"）。向量相似度检索。</div>
+    </div>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-header"><span class="card-icon">☕</span><div class="card-title">Spring AI 记忆实现</div></div>
+  <pre>// 短期记忆：保留最近10条消息
+@Bean
+public ChatMemory chatMemory() {
+    return new InMemoryChatMemory();  // 或 RedisChatMemory
+}
+
+// 带记忆的对话（MessageChatMemoryAdvisor 自动管理）
+public String chatWithMemory(String conversationId, String userMsg) {
+    return chatClient.prompt()
+        .advisors(new MessageChatMemoryAdvisor(
+            chatMemory, conversationId, 10))  // 10轮窗口
+        .user(userMsg)
+        .call()
+        .content();
+}
+
+// 长期记忆：对话结束后提取并存储
+public void saveImportantInfo(String userId, String conversation) {
+    // 让 LLM 从对话中提取关键信息
+    String extracted = chatClient.prompt()
+        .system("从以下对话提取用户关键信息，以JSON格式返回")
+        .user(conversation)
+        .call().content();
+    // 存入向量数据库
+    vectorStore.add(new Document(extracted,
+        Map.of("userId", userId)));
+}</pre>
+</div>
+
+<div class="card">
+  <div class="card-header"><span class="card-icon">💡</span><div class="card-title">记忆设计关键决策</div></div>
+  <table class="compare-table">
+    <tr><th>决策点</th><th>选项</th><th>推荐</th></tr>
+    <tr><td>记忆写入时机</td><td>对话结束 vs 实时</td><td>对话结束后批量提取，降低延迟</td></tr>
+    <tr><td>记忆检索策略</td><td>时间顺序 vs 相关性</td><td>向量相似度检索 + 时间权重</td></tr>
+    <tr><td>记忆更新方式</td><td>覆盖 vs 追加</td><td>追加 + 定期整合摘要</td></tr>
+    <tr><td>记忆存储介质</td><td>内存 vs Redis vs 向量库</td><td>短期用Redis，长期用向量库</td></tr>
+  </table>
+</div>
+</div>
+<!-- ==================== END Memory ==================== -->
+
+<!-- ==================== Spring AI ==================== -->
+<div id="page-springai" class="page">
+<div class="section-title">☕ Spring AI</div>
+<div class="section-desc">Java 生态官方 AI 框架 — 你最熟悉的方式接入 LLM</div>
+
+<div class="card">
+  <div class="card-header"><span class="card-icon">❓</span><div class="card-title">解决什么问题？</div></div>
+  <p>Java 开发者要用 LLM，需要处理 HTTP 调用、流式响应、Embedding、向量存储等复杂底层。Spring AI 提供统一抽象层，让你像写 <code>@Autowired</code> 一样使用 AI，屏蔽不同模型提供商的差异。</p>
+</div>
+
+<div class="card">
+  <div class="card-header"><span class="card-icon">🏗️</span><div class="card-title">核心架构（四大抽象）</div></div>
+  <div class="principle-grid">
+    <div class="principle-box"><div class="label">ChatModel</div><div class="value">对话生成，支持流式(Flux)和阻塞两种方式</div></div>
+    <div class="principle-box p2"><div class="label">EmbeddingModel</div><div class="value">文本向量化，RAG 建库时使用</div></div>
+    <div class="principle-box p3"><div class="label">VectorStore</div><div class="value">向量数据库抽象，支持 Pinecone/Chroma/PGVector 等</div></div>
+    <div class="principle-box p4"><div class="label">ChatClient</div><div class="value">高级 API，流式 Builder 模式，内置 Advisor 拦截</div></div>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-header"><span class="card-icon">🚀</span><div class="card-title">快速开始</div></div>
+  <pre><!-- pom.xml -->
+&lt;dependency&gt;
+    &lt;groupId&gt;org.springframework.ai&lt;/groupId&gt;
+    &lt;artifactId&gt;spring-ai-openai-spring-boot-starter&lt;/artifactId&gt;
+&lt;/dependency&gt;</pre>
+  <pre># application.yml
+spring:
+  ai:
+    openai:
+      api-key: ${OPENAI_API_KEY}
+      chat:
+        options:
+          model: gpt-4o
+          temperature: 0.7</pre>
+  <pre>// 最简单的用法
+@RestController
+public class ChatController {
+    @Autowired ChatClient chatClient;
+
+    @PostMapping("/chat")
+    public String chat(@RequestBody String message) {
+        return chatClient.prompt()
+            .user(message)
+            .call()
+            .content();
+    }
+
+    // 流式响应
+    @GetMapping(value = "/stream", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+    public Flux&lt;String&gt; stream(@RequestParam String message) {
+        return chatClient.prompt()
+            .user(message)
+            .stream()
+            .content();
+    }
+}</pre>
+</div>
+
+<div class="card">
+  <div class="card-header"><span class="card-icon">🔌</span><div class="card-title">Advisor 拦截器（核心特性）</div></div>
+  <p>类似 Spring AOP，在请求前后做增强：</p>
+  <pre>chatClient.prompt()
+    .advisors(
+        new QuestionAnswerAdvisor(vectorStore),   // RAG自动检索注入
+        new MessageChatMemoryAdvisor(memory),      // 自动管理对话历史
+        new SimpleLoggerAdvisor()                  // 打印请求/响应日志
+    )
+    .user(question)
+    .call().content();</pre>
+</div>
+</div>
+<!-- ==================== END Spring AI ==================== -->
+
+<!-- ==================== Spring AI Alibaba ==================== -->
+<div id="page-springai-alibaba" class="page">
+<div class="section-title">☁️ Spring AI Alibaba</div>
+<div class="section-desc">阿里云 + 通义千问的 Java AI 首选方案</div>
+
+<div class="card">
+  <div class="card-header"><span class="card-icon">❓</span><div class="card-title">解决什么问题？</div></div>
+  <p>Spring AI 官方对阿里云支持有限，Spring AI Alibaba 是阿里开源的扩展，深度集成通义千问、DashScope、Nacos、DashVector，适合在阿里云体系内构建 AI 应用，无需自建基础设施。</p>
+  <div class="tags">
+    <span class="tag hot">国内首选</span>
+    <span class="tag java">Java</span>
+    <span class="tag new">2024开源</span>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-header"><span class="card-icon">🆚</span><div class="card-title">vs 原生 Spring AI 对比</div></div>
+  <table class="compare-table">
+    <tr><th>维度</th><th>Spring AI</th><th>Spring AI Alibaba</th></tr>
+    <tr><td>模型支持</td><td>OpenAI/Azure/Ollama等</td><td>通义系列(Qwen) + DashScope</td></tr>
+    <tr><td>向量数据库</td><td>Pinecone/Chroma/PGVector</td><td>DashVector（阿里云）</td></tr>
+    <tr><td>配置中心</td><td>无</td><td>Nacos 动态配置</td></tr>
+    <tr><td>函数计算</td><td>基础 Tool Calling</td><td>集成阿里云函数计算</td></tr>
+    <tr><td>适用场景</td><td>多云/海外</td><td>国内/阿里云体系</td></tr>
+  </table>
+</div>
+
+<div class="card">
+  <div class="card-header"><span class="card-icon">🚀</span><div class="card-title">快速接入</div></div>
+  <pre><!-- pom.xml -->
+&lt;dependency&gt;
+    &lt;groupId&gt;com.alibaba.cloud.ai&lt;/groupId&gt;
+    &lt;artifactId&gt;spring-ai-alibaba-starter&lt;/artifactId&gt;
+    &lt;version&gt;1.0.0&lt;/version&gt;
+&lt;/dependency&gt;</pre>
+  <pre># application.yml
+spring:
+  ai:
+    dashscope:
+      api-key: ${DASHSCOPE_API_KEY}
+      chat:
+        options:
+          model: qwen-max          # qwen-plus / qwen-turbo
+          temperature: 0.7</pre>
+  <pre>// 用法与 Spring AI 完全一致
+@Autowired ChatClient chatClient;
+
+public String chat(String msg) {
+    return chatClient.prompt().user(msg).call().content();
+}</pre>
+  <div class="alert success">✅ API 完全兼容 Spring AI，切换只需改依赖和配置，业务代码零修改！</div>
+</div>
+</div>
+<!-- ==================== END Spring AI Alibaba ==================== -->
+
+<!-- ==================== LangChain4j ==================== -->
+<div id="page-langchain4j" class="page">
+<div class="section-title">⛓️ LangChain4j</div>
+<div class="section-desc">Java 版 LangChain — 比 Spring AI 更灵活，更接近 Python 生态</div>
+
+<div class="card">
+  <div class="card-header"><span class="card-icon">❓</span><div class="card-title">解决什么问题？</div></div>
+  <p>Python 的 LangChain 生态很成熟，但 Java 开发者用不了。LangChain4j 移植了 LangChain 的核心设计理念到 Java，提供更灵活的链式组合和更完善的 Agent 支持（60+模型提供商）。</p>
+</div>
+
+<div class="card">
+  <div class="card-header"><span class="card-icon">🏗️</span><div class="card-title">核心特性：AiServices（声明式接口）</div></div>
+  <p>LangChain4j 最强特性：像写接口一样定义 AI 能力，底层自动实现。</p>
+  <pre>// 1. 声明 AI 服务接口（纯注解）
+interface CustomerServiceAssistant {
+
+    @SystemMessage("你是咔咔快的客服助手，只回答WiFi相关问题")
+    String chat(@MemoryId String userId, @UserMessage String question);
+
+    @SystemMessage("分析用户意图，返回JSON")
+    @UserMessage("用户说：{{message}}")
+    IntentResult analyzeIntent(@V("message") String message);
+}
+
+// 2. Spring 自动注入，AiServices 创建实现
+@Bean
+public CustomerServiceAssistant assistant(ChatLanguageModel model,
+                                          ChatMemoryStore memoryStore) {
+    return AiServices.builder(CustomerServiceAssistant.class)
+        .chatLanguageModel(model)
+        .chatMemoryProviderByUserId(userId ->
+            MessageWindowChatMemory.withMaxMessages(10))
+        .tools(new OrderQueryTools())
+        .build();
+}
+
+// 3. 直接调用，就像普通 Service
+@Autowired CustomerServiceAssistant assistant;
+String reply = assistant.chat("user123", "我的套餐到期了吗");</pre>
+</div>
+
+<div class="card">
+  <div class="card-header"><span class="card-icon">🆚</span><div class="card-title">Spring AI vs LangChain4j 选哪个？</div></div>
+  <table class="compare-table">
+    <tr><th>场景</th><th>推荐</th><th>原因</th></tr>
+    <tr><td>Spring Boot 项目，国内阿里云</td><td>Spring AI Alibaba</td><td>生态一致，零学习成本</td></tr>
+    <tr><td>需要复杂 Agent 链</td><td>LangChain4j</td><td>AiServices + 链式组合更灵活</td></tr>
+    <tr><td>多模型切换</td><td>LangChain4j</td><td>60+ 提供商，切换代价小</td></tr>
+    <tr><td>企业级微服务</td><td>Spring AI</td><td>与 Spring Cloud 整合更自然</td></tr>
+  </table>
+  <div class="alert tip">💡 面试回答：优先用 Spring AI Alibaba（Spring 生态一致），复杂 Agent 场景可以引入 LangChain4j。</div>
+</div>
+</div>
+<!-- ==================== END LangChain4j ==================== -->
+
+<!-- ==================== Agent 介绍 ==================== -->
+<div id="page-agent-intro" class="page">
+<div class="section-title">🤖 Agent 是什么？</div>
+<div class="section-desc">第一性原理：Agent = LLM + 工具 + 记忆 + 自主决策循环</div>
+
+<div class="card">
+  <div class="card-header"><span class="card-icon">❓</span><div class="card-title">解决什么问题？</div></div>
+  <p>普通 LLM 是「问答机器」——给它一个问题，它给一个答案，仅此而已。Agent 解决「自主完成复杂任务」的问题——它能<strong>自己决定下一步做什么、调用什么工具、什么时候停止</strong>，像真正的工作者而不只是回答者。</p>
+  <div class="highlight-box">
+    <p><strong>类比：</strong>LLM 是一个博学的顾问（只能说），Agent 是一个能执行任务的助理（能说 + 能做）。</p>
+    <p><strong>对比你的经验：</strong>支付系统中的「状态机 + 补偿机制」和 Agent 的「Loop + 工具调用」思路高度一致！</p>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-header"><span class="card-icon">🏗️</span><div class="card-title">Agent 四要素</div></div>
+  <div class="principle-grid">
+    <div class="principle-box">
+      <div class="label">大脑 · LLM</div>
+      <div class="value">负责推理、规划、决策。"下一步该做什么？"</div>
+    </div>
+    <div class="principle-box p2">
+      <div class="label">手脚 · Tools</div>
+      <div class="value">执行能力：搜索、查数据库、调API、写文件</div>
+    </div>
+    <div class="principle-box p3">
+      <div class="label">记忆 · Memory</div>
+      <div class="value">短期对话历史 + 长期用户画像 + 知识库</div>
+    </div>
+    <div class="principle-box p4">
+      <div class="label">循环 · Loop</div>
+      <div class="value">持续「感知→思考→行动」直到任务完成</div>
+    </div>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-header"><span class="card-icon">🔄</span><div class="card-title">Agent Loop（智能体循环）— 吴恩达核心观点</div></div>
+  <div class="flow">
+    <div class="flow-step" style="border-color:var(--accent3)">接收任务</div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step">LLM 推理<br/>下一步</div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step">调用工具<br/>（可能没有）</div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step">获取结果<br/>更新上下文</div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step">是否完成？</div>
+    <div class="flow-arrow" style="color:var(--accent3)">否→循环</div>
+  </div>
+  <div class="alert info">💡 <strong>吴恩达观点：</strong>Agentic Loop 的迭代次数越多，任务质量越高。但需要控制成本和稳定性——无限循环是风险，必须设置最大步数。</div>
+</div>
+
+<div class="card">
+  <div class="card-header"><span class="card-icon">📊</span><div class="card-title">吴恩达四大 Agent 设计模式</div></div>
+  <table class="compare-table">
+    <tr><th>模式</th><th>是什么</th><th>使用场景</th></tr>
+    <tr><td><strong>Reflection 反思</strong></td><td>Agent 对自身输出进行自我批评和改进</td><td>代码生成后自我 Review、文章写作后自我修改</td></tr>
+    <tr><td><strong>Tool Use 工具使用</strong></td><td>赋予 Agent 外部工具能力</td><td>需要查资料、调 API、执行代码的任务</td></tr>
+    <tr><td><strong>Planning 规划</strong></td><td>将复杂任务分解为子任务序列</td><td>多步骤任务，路径不确定</td></tr>
+    <tr><td><strong>Multi-Agent 协作</strong></td><td>多个专职 Agent 分工协作</td><td>超出单 Agent 能力的复杂任务</td></tr>
+  </table>
+</div>
+</div>
+<!-- ==================== END Agent 介绍 ==================== -->
+
+<!-- ==================== ReAct Agent ==================== -->
+<div id="page-react" class="page">
+<div class="section-title">🔄 ReAct Agent</div>
+<div class="section-desc">Reasoning + Acting — 最主流的 Agent 执行模式</div>
+
+<div class="card">
+  <div class="card-header"><span class="card-icon">❓</span><div class="card-title">解决什么问题？</div></div>
+  <p>如何让 LLM 在执行过程中持续推理、动态决策下一步？ReAct（论文：2022 Google）解决「推理和行动交织」的问题——每步先 Thought（推理），再 Action（行动），再观察 Observation，形成螺旋上升的执行链。</p>
+</div>
+
+<div class="card">
+  <div class="card-header"><span class="card-icon">📋</span><div class="card-title">ReAct 执行示例</div></div>
+  <pre>用户：帮我查一下手机号 13800138000 的套餐状态，如果快到期了提醒续费
+
+Thought: 用户想查套餐状态，需要先调用查询工具
+Action: query_package(phone="13800138000")
+Observation: {"package":"100G月套餐","expire_date":"2025-01-25","remain_days":3}
+
+Thought: 套餐还有3天到期，需要提醒用户续费。再查一下有哪些续费套餐
+Action: list_packages()
+Observation: [{"name":"100G月套餐","price":29},{"name":"200G月套餐","price":49}]
+
+Thought: 已获取套餐信息，可以给出完整建议了
+Final Answer: 您好！您的100G月套餐还有3天到期（1月25日）。
+推荐续费方案：100G月套餐29元 或 升级200G月套餐49元。</pre>
+</div>
+
+<div class="card">
+  <div class="card-header"><span class="card-icon">☕</span><div class="card-title">Spring AI 实现 ReAct Agent</div></div>
+  <pre>// Spring AI 内置 ReAct Agent 支持
+@Bean
+public Agent reactAgent(ChatClient.Builder builder,
+                         List&lt;ToolCallback&gt; tools) {
+    return AgentBuilder.builder(builder)
+        .tools(tools)
+        .maxIterations(10)           // 最多10步，防死循环
+        .build();
+}
+
+// 工具注册
+@Component
+public class PackageTools implements ToolCallback {
+
+    @Tool(description = "查询用户套餐信息，参数为手机号")
+    public String queryPackage(String phone) {
+        PackageInfo info = service.query(phone);
+        return JsonUtil.toJson(info);
+    }
+
+    @Tool(description = "获取所有可购买套餐列表")
+    public String listPackages() {
+        return JsonUtil.toJson(service.listAll());
+    }
+}
+
+// 使用
+String result = reactAgent.call("帮我查 13800138000 的套餐状态");</pre>
+</div>
+
+<div class="card">
+  <div class="card-header"><span class="card-icon">⚠️</span><div class="card-title">注意事项 & 避坑</div></div>
+  <ul>
+    <li><strong>必须设最大迭代数：</strong>没有上限会死循环，推荐 5-15 步</li>
+    <li><strong>工具描述要精准：</strong>Thought 阶段 LLM 靠描述选工具，模糊描述导致调错</li>
+    <li><strong>Observation 格式要简洁：</strong>返回结构化 JSON，不要返回大段文本</li>
+    <li><strong>失败处理：</strong>工具失败要返回错误信息而不是抛异常，让 LLM 能重试</li>
+    <li><strong>成本控制：</strong>每步都消耗 Token，复杂任务成本高，用缓存</li>
+  </ul>
+</div>
+</div>
+<!-- ==================== END ReAct ==================== -->
+
+<!-- ==================== Multi-Agent ==================== -->
+<div id="page-multi-agent" class="page">
+<div class="section-title">👥 Multi-Agent 多智能体</div>
+<div class="section-desc">专业分工协作，突破单一 Agent 的能力边界</div>
+
+<div class="card">
+  <div class="card-header"><span class="card-icon">❓</span><div class="card-title">解决什么问题？</div></div>
+  <p>单个 Agent 的上下文窗口有限，无法同时具备所有能力。Multi-Agent 解决「复杂任务的分工与协作」——就像微服务把单体拆开，把大任务拆成小任务，让专职 Agent 各司其职，用消息协作完成整体。</p>
+  <div class="alert success">✅ 类比你的经验：微服务架构 = Multi-Agent 架构，Orchestrator = Gateway，Worker Agent = 各微服务</div>
+</div>
+
+<div class="card">
+  <div class="card-header"><span class="card-icon">🏗️</span><div class="card-title">两种协作模式</div></div>
+  <div class="grid2">
+    <div class="highlight-box">
+      <div class="h3">Supervisor 模式（中心化）</div>
+      <p>一个 Orchestrator Agent 接收任务，分析后调度 Worker Agent，收集结果后汇总。</p>
+      <div class="flow" style="flex-direction:column;align-items:flex-start">
+        <div class="flow-step">用户任务</div>
+        <div class="flow-arrow" style="transform:rotate(90deg)">→</div>
+        <div class="flow-step" style="border-color:var(--accent)">Orchestrator</div>
+        <div style="display:flex;gap:8px;margin-top:4px">
+          <div class="flow-step" style="font-size:0.75rem">意图识别Agent</div>
+          <div class="flow-step" style="font-size:0.75rem">套餐查询Agent</div>
+          <div class="flow-step" style="font-size:0.75rem">推荐Agent</div>
+        </div>
+      </div>
+    </div>
+    <div class="highlight-box">
+      <div class="h3">Pipeline 模式（流水线）</div>
+      <p>Agent 依次处理，上一个的输出是下一个的输入，适合有固定处理顺序的任务。</p>
+      <div class="flow">
+        <div class="flow-step" style="font-size:0.78rem">意图识别</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step" style="font-size:0.78rem">信息提取</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step" style="font-size:0.78rem">业务处理</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step" style="font-size:0.78rem">回复生成</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-header"><span class="card-icon">💡</span><div class="card-title">何时用 Multi-Agent？</div></div>
+  <table class="compare-table">
+    <tr><th>场景</th><th>推荐方案</th></tr>
+    <tr><td>任务超出上下文窗口</td><td>Multi-Agent 分段处理</td></tr>
+    <tr><td>需要并行执行多个子任务</td><td>Supervisor + 并行 Worker</td></tr>
+    <tr><td>不同阶段需要不同专业能力</td><td>Pipeline 流水线</td></tr>
+    <tr><td>需要相互校验结果</td><td>多 Agent 投票/审核模式</td></tr>
+    <tr><td>简单单次问答</td><td>❌ 不用，直接单 Agent 即可</td></tr>
+  </table>
+</div>
+</div>
+<!-- ==================== END Multi-Agent ==================== -->
+
+<!-- ==================== Agent 设计模式 ==================== -->
+<div id="page-agent-pattern" class="page">
+<div class="section-title">🏗️ Agent 设计模式</div>
+<div class="section-desc">从吴恩达课程提炼的四大模式，生产级 Agent 必备</div>
+
+<div class="card">
+  <div class="card-header"><span class="card-icon">1️⃣</span><div class="card-title">Reflection 反思模式</div></div>
+  <p><strong>问题：</strong>LLM 第一次输出质量不够好，如何自动优化？</p>
+  <p><strong>原理：</strong>让 Agent 生成输出后，再用另一个（或同一个）LLM 来批评、指出问题，然后根据批评重新生成，循环直到满意。</p>
+  <pre>// 生成-批评-改进循环
+String code = generateCode(task);
+for (int i = 0; i &lt; 3; i++) {
+    String critique = critiqueAgent.review(code,
+        "找出这段代码的问题：安全漏洞、性能问题、代码规范");
+    if (critique.contains("无问题")) break;
+    code = improveAgent.fix(code, critique);
+}
+return code;</pre>
+  <div class="alert tip">💡 代码生成、文章写作、SQL 优化等任务用反思模式，质量提升显著</div>
+</div>
+
+<div class="card">
+  <div class="card-header"><span class="card-icon">2️⃣</span><div class="card-title">Plan-and-Execute 规划执行模式</div></div>
+  <p><strong>对比 ReAct：</strong>ReAct 是边想边做（每步决策），Plan-Execute 是先想全再做（全局规划）。</p>
+  <div class="grid2">
+    <div class="highlight-box">
+      <div class="h3">适合 Plan-Execute 的场景</div>
+      <ul>
+        <li>任务步骤相对固定</li>
+        <li>需要并行执行多步骤</li>
+        <li>希望用户能看到执行计划</li>
+      </ul>
+    </div>
+    <div class="highlight-box">
+      <div class="h3">适合 ReAct 的场景</div>
+      <ul>
+        <li>任务路径动态变化</li>
+        <li>每步依赖上步结果</li>
+        <li>探索性任务</li>
+      </ul>
+    </div>
+  </div>
+  <pre>// Plan-and-Execute 伪代码
+List&lt;Step&gt; plan = plannerAgent.createPlan(userTask);
+// 可并行执行无依赖步骤
+List&lt;Result&gt; results = executeInParallel(plan);
+String finalAnswer = synthesizerAgent.synthesize(results);</pre>
+</div>
+
+<div class="card">
+  <div class="card-header"><span class="card-icon">3️⃣</span><div class="card-title">Tool Use 工具使用模式</div></div>
+  <p>已在「Tool Calling」章节详细介绍。重点在工具的分类管理：</p>
+  <div class="principle-grid">
+    <div class="principle-box"><div class="label">只读工具</div><div class="value">查询类，可重复调用，无需确认。如：查套餐、查余额</div></div>
+    <div class="principle-box p2"><div class="label">写入工具</div><div class="value">修改类，需要幂等设计。如：发短信、创建订单</div></div>
+    <div class="principle-box p3"><div class="label">危险工具</div><div class="value">不可逆操作，必须有人工确认步骤。如：退款、注销账户</div></div>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-header"><span class="card-icon">4️⃣</span><div class="card-title">Multi-Agent 协作模式</div></div>
+  <p>已在「Multi-Agent」章节详细介绍。记住核心价值：</p>
+  <ul>
+    <li><strong>分工专精：</strong>每个 Agent 只做一件事，做好一件事</li>
+    <li><strong>并行加速：</strong>无依赖任务并行执行，缩短总耗时</li>
+    <li><strong>互相校验：</strong>一个 Agent 生成，另一个 Agent 审核</li>
+    <li><strong>上下文独立：</strong>每个 Agent 有自己的上下文，不相互污染</li>
+  </ul>
+</div>
+</div>
+<!-- ==================== END Agent Pattern ==================== -->
+
+<!-- ==================== Cursor ==================== -->
+<div id="page-cursor" class="page">
+<div class="section-title">🖱️ Cursor — AI 原生 IDE</div>
+<div class="section-desc">Vibe Coding 的核心工具，用对了效率翻倍</div>
+
+<div class="card">
+  <div class="card-header"><span class="card-icon">❓</span><div class="card-title">解决什么问题？</div></div>
+  <p>传统 IDE 里的 AI 插件是「外挂」——割裂的体验。Cursor 把 AI 做进 IDE 核心，让 AI 真正理解整个代码库，而不只是当前文件。解决「AI 不了解你项目上下文」的根本问题。</p>
+</div>
+
+<div class="card">
+  <div class="card-header"><span class="card-icon">🔑</span><div class="card-title">核心功能速查</div></div>
+  <table class="compare-table">
+    <tr><th>功能</th><th>快捷键</th><th>用途</th><th>技巧</th></tr>
+    <tr><td><strong>Tab 补全</strong></td><td>Tab</td><td>智能补全当前代码</td><td>不只是代码，能补全注释、SQL、配置</td></tr>
+    <tr><td><strong>Cmd+K</strong></td><td>Ctrl+K</td><td>内联编辑/生成</td><td>选中代码后 Ctrl+K，描述修改意图</td></tr>
+    <tr><td><strong>Chat</strong></td><td>Ctrl+L</td><td>对话，可引用文件</td><td>用 @文件名 引用特定文件</td></tr>
+    <tr><td><strong>Composer</strong></td><td>Ctrl+I</td><td>多文件生成/修改</td><td>复杂功能开发首选，能跨文件操作</td></tr>
+    <tr><td><strong>@codebase</strong></td><td>Chat中输入</td><td>搜索整个代码库</td><td>问「哪里处理了支付回调？」</td></tr>
+  </table>
+</div>
+
+<div class="card">
+  <div class="card-header"><span class="card-icon">📋</span><div class="card-title">Cursor Rules — 项目级 Prompt（重点！）</div></div>
+  <p>在项目根目录创建 <code>.cursorrules</code> 文件，约束 AI 的行为，让所有成员的 AI 输出保持一致。</p>
+  <pre># .cursorrules 示例（Java 微服务项目）
+
+## 技术栈
+- Java 17 + Spring Boot 3.x + Spring Cloud Alibaba
+- 数据库：MySQL + Redis + MongoDB
+- 消息队列：RabbitMQ
+
+## 代码规范
+- 使用 Lombok @Slf4j 而不是手动定义 Logger
+- Service 层方法必须有事务注解 @Transactional
+- 所有金额计算使用 BigDecimal，禁止使用 double
+- API 响应统一使用 Result&lt;T&gt; 包装
+
+## 命名规范
+- 接口名：XxxService，实现类：XxxServiceImpl
+- Controller 方法：驼峰命名，如 queryPackageInfo
+- 数据库字段：下划线命名，如 create_time
+
+## 禁止事项
+- 禁止在 Controller 层写业务逻辑
+- 禁止使用 System.out.println，统一用日志
+- 金额相关接口必须添加幂等校验</pre>
+  <div class="alert success">✅ 你简历里提到用 Cursor Rules 约束项目规范，这是加分项！面试时重点展开讲。</div>
+</div>
+</div>
+<!-- ==================== END Cursor ==================== -->
+
+<!-- ==================== Claude Code ==================== -->
+<div id="page-claude-code" class="page">
+<div class="section-title">⚡ Claude Code</div>
+<div class="section-desc">终端原生 AI — 直接操作文件系统和 Git 的编码助手</div>
+
+<div class="card">
+  <div class="card-header"><span class="card-icon">❓</span><div class="card-title">解决什么问题？</div></div>
+  <p>Cursor 是 IDE 层面的 AI，Claude Code 是终端层面的 AI Agent。它能直接读写文件、执行命令、操作 Git，适合自动化编码任务、代码审查、项目初始化等场景。核心区别：Claude Code 是一个 <strong>可自主完成任务的 Agent</strong>，不只是辅助工具。</p>
+</div>
+
+<div class="card">
+  <div class="card-header"><span class="card-icon">🔑</span><div class="card-title">核心能力</div></div>
+  <div class="principle-grid">
+    <div class="principle-box"><div class="label">文件操作</div><div class="value">读、写、搜索整个代码库，理解项目结构</div></div>
+    <div class="principle-box p2"><div class="label">命令执行</div><div class="value">运行测试、构建、Git 操作、任意 Shell 命令</div></div>
+    <div class="principle-box p3"><div class="label">Slash 命令</div><div class="value">/review /init /fix /test 等内置工作流</div></div>
+    <div class="principle-box p4"><div class="label">Skills 技能</div><div class="value">可扩展的业务能力模块（后面详细介绍）</div></div>
+    <div class="principle-box"><div class="label">Hooks 钩子</div><div class="value">自动化触发：文件保存、命令执行前后</div></div>
+    <div class="principle-box p2"><div class="label">MCP 集成</div><div class="value">通过 MCP 协议接入任意外部工具和服务</div></div>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-header"><span class="card-icon">📋</span><div class="card-title">CLAUDE.md — 项目 AI 说明书</div></div>
+  <p>在项目根目录放 <code>CLAUDE.md</code>，每次 Claude Code 启动时自动读取，等同于给 AI 的项目文档：</p>
+  <pre># 项目：咔咔快随身WiFi平台
+
+## 技术栈
+Spring Boot 3.2 + Spring Cloud Alibaba + MySQL + Redis + RabbitMQ
+
+## 项目结构
+- kaka-api: 用户端接口
+- kaka-admin: 管理后台
+- kaka-sync: 运营商数据同步
+- kaka-ai: AI客服模块
+
+## 重要约定
+- 支付相关金额必须 BigDecimal
+- 所有外部接口调用必须有熔断配置
+- 运营商接口统一走 OperatorAdapter 抽象
+
+## 常用命令
+- 启动: mvn spring-boot:run -pl kaka-api
+- 测试: mvn test -pl kaka-api
+- 构建: mvn package -DskipTests</pre>
+</div>
+</div>
+<!-- ==================== END Claude Code ==================== -->
+
+<!-- ==================== Vibe 开发流程 ==================== -->
+<div id="page-vibe-flow" class="page">
+<div class="section-title">🌊 AI 驱动开发流程</div>
+<div class="section-desc">你简历里提到的流程，系统化理解和展示</div>
+
+<div class="card">
+  <div class="card-header"><span class="card-icon">🔄</span><div class="card-title">完整 AI 驱动开发流程</div></div>
+  <div class="flow" style="flex-direction:column;align-items:flex-start;gap:8px">
+    <div class="flow-step" style="width:100%;border-color:var(--accent3)">① 需求理解 → 让 AI 帮你梳理需求，提出遗漏点和边界情况</div>
+    <div class="flow-step" style="width:100%;border-color:var(--accent4)">② PRD 生成 → 用 AI 生成结构化 PRD，人工 Review 确认</div>
+    <div class="flow-step" style="width:100%;border-color:var(--accent2)">③ 验收标准 → AI 基于 PRD 生成测试用例和验收条件</div>
+    <div class="flow-step" style="width:100%;border-color:var(--accent5)">④ 技术方案 → AI 给出技术设计，Review 架构和风险点</div>
+    <div class="flow-step" style="width:100%;border-color:var(--accent)">⑤ Plan/编码 → Cursor Composer 多文件生成，严格遵循 .cursorrules</div>
+    <div class="flow-step" style="width:100%;border-color:var(--accent3)">⑥ Review → /code-review 自动检查，人工审核 AI Review 结果</div>
+    <div class="flow-step" style="width:100%;border-color:var(--accent5)">⑦ 测试 → AI 生成测试用例，跑通后提交</div>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-header"><span class="card-icon">💡</span><div class="card-title">关键技巧</div></div>
+  <div class="grid2">
+    <div class="highlight-box">
+      <div class="h3">提效技巧</div>
+      <ul>
+        <li>需求阶段：让 AI 扮演测试同学，找 Edge Case</li>
+        <li>编码阶段：先写注释/接口，让 AI 填实现</li>
+        <li>Review 阶段：指定 Review 维度（安全/性能/规范）</li>
+        <li>调试阶段：把错误日志和代码一起贴给 AI</li>
+      </ul>
+    </div>
+    <div class="highlight-box">
+      <div class="h3">注意事项</div>
+      <ul>
+        <li>AI 生成的代码必须 Review，不能盲目信任</li>
+        <li>敏感信息（密钥/密码）不要贴给 AI</li>
+        <li>复杂业务逻辑要提供完整上下文</li>
+        <li>分步迭代，不要一次性让 AI 生成太多</li>
+      </ul>
+    </div>
+  </div>
+</div>
+</div>
+<!-- ==================== END Vibe Flow ==================== -->
+
+<!-- ==================== Skills ==================== -->
+<div id="page-skills" class="page">
+<div class="section-title">🎯 Skills 技能系统</div>
+<div class="section-desc">第一性原理：把可复用的 AI 能力模块化封装</div>
+
+<div class="card">
+  <div class="card-header"><span class="card-icon">❓</span><div class="card-title">解决什么问题？</div></div>
+  <p>AI 助手的能力需要反复重复配置，每次都要写复杂的 Prompt 描述。Skills 解决「能力的复用和标准化」问题——把常用的 AI 工作流（代码审查、深度研究、安全扫描）打包成可直接调用的 Skill，一行命令触发复杂工作流。</p>
+  <div class="highlight-box">
+    <p><strong>类比：</strong>Skills 就是 AI 世界的「API 接口」——封装内部实现，暴露简单调用方式。</p>
+    <p><strong>类比 Java：</strong>就像把业务逻辑封装进 <code>@Service</code>，调用方只需 <code>@Autowired</code> 使用。</p>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-header"><span class="card-icon">📦</span><div class="card-title">Claude Code 内置 Skills</div></div>
+  <table class="compare-table">
+    <tr><th>Skill</th><th>调用</th><th>做什么</th></tr>
+    <tr><td><strong>code-review</strong></td><td>/code-review</td><td>多维度审查代码：Bug、安全漏洞、性能问题</td></tr>
+    <tr><td><strong>deep-research</strong></td><td>/deep-research [问题]</td><td>多源搜索 + 交叉验证 + 生成研究报告</td></tr>
+    <tr><td><strong>security-review</strong></td><td>/security-review</td><td>安全漏洞扫描：SQL注入/XSS/权限问题</td></tr>
+    <tr><td><strong>verify</strong></td><td>/verify</td><td>启动应用验证功能是否正常</td></tr>
+    <tr><td><strong>simplify</strong></td><td>/simplify</td><td>代码简化重构，去除冗余</td></tr>
+    <tr><td><strong>init</strong></td><td>/init</td><td>初始化 CLAUDE.md 项目文档</td></tr>
+  </table>
+</div>
+
+<div class="card">
+  <div class="card-header"><span class="card-icon">🏗️</span><div class="card-title">自定义 Skill 开发</div></div>
+  <p>在 <code>.claude/skills/</code> 目录下创建 Skill 文件：</p>
+  <pre># .claude/skills/payment-review.md
+
+# 支付安全审查 Skill
+
+## 触发条件
+当用户调用 /payment-review 时执行
+
+## 执行步骤
+1. 扫描所有包含 payment/pay/order/amount 的文件
+2. 检查以下安全问题：
+   - 金额是否使用 BigDecimal（禁止 double/float）
+   - 回调接口是否有签名验证
+   - 订单是否有幂等检查
+   - 敏感字段是否加密存储
+3. 生成安全报告，按严重程度分级（高/中/低）
+
+## 输出格式
+Markdown 表格，包含：文件、行号、问题描述、修复建议</pre>
+  <div class="alert info">💡 Skills 本质是结构化 Prompt，定义了一个可复用的工作流程。企业可以把内部最佳实践沉淀为 Skills 库。</div>
+</div>
+</div>
+<!-- ==================== END Skills ==================== -->
+
+<!-- ==================== Harness ==================== -->
+<div id="page-harness" class="page">
+<div class="section-title">🏋️ Harness 执行框架</div>
+<div class="section-desc">第一性原理：Agent 的可靠运行基础设施</div>
+
+<div class="card">
+  <div class="card-header"><span class="card-icon">❓</span><div class="card-title">解决什么问题？</div></div>
+  <p>Agent 在生产环境中需要：权限控制、工具注册、上下文管理、错误恢复、日志审计。Harness 解决「Agent 可靠、可控地运行」的问题——提供 Agent 运行的基础设施层，就像 Kubernetes 是容器的运行基础设施。</p>
+  <div class="highlight-box">
+    <p><strong>类比：</strong>Harness = Spring 容器。Agent = Spring Bean。Tools = Spring 组件。Settings = application.yml。</p>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-header"><span class="card-icon">🏗️</span><div class="card-title">Harness 核心能力</div></div>
+  <div class="principle-grid">
+    <div class="principle-box">
+      <div class="label">权限控制</div>
+      <div class="value">settings.json 定义哪些工具/命令允许执行，防止 Agent 越权</div>
+    </div>
+    <div class="principle-box p2">
+      <div class="label">工具注册</div>
+      <div class="value">统一注册可用工具，Agent 只能调用已注册的工具</div>
+    </div>
+    <div class="principle-box p3">
+      <div class="label">Hooks 机制</div>
+      <div class="value">执行前后自动触发：代码格式化、安全检查、日志记录</div>
+    </div>
+    <div class="principle-box p4">
+      <div class="label">上下文管理</div>
+      <div class="value">管理对话历史、项目记忆、会话状态</div>
+    </div>
+    <div class="principle-box">
+      <div class="label">错误恢复</div>
+      <div class="value">工具失败重试、中断恢复、优雅降级</div>
+    </div>
+    <div class="principle-box p2">
+      <div class="label">审计日志</div>
+      <div class="value">记录 Agent 的所有操作，便于问题排查和合规审计</div>
+    </div>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-header"><span class="card-icon">📋</span><div class="card-title">Claude Code Settings.json 配置</div></div>
+  <pre>// .claude/settings.json
+{
+  "permissions": {
+    "allow": [
+      "Bash(git *)",           // 允许所有 git 命令
+      "Bash(mvn test)",        // 允许运行测试
+      "Bash(mvn package)",     // 允许构建
+      "Read(**)",              // 允许读任意文件
+      "Edit(**)"               // 允许编辑任意文件
+    ],
+    "deny": [
+      "Bash(rm -rf *)",        // 禁止危险删除
+      "Bash(git push *)"       // 禁止自动推送（需人工确认）
+    ]
+  },
+  "hooks": {
+    "PostToolUse[Edit]": [
+      {
+        "command": "mvn checkstyle:check",  // 每次编辑后自动代码检查
+        "description": "代码风格检查"
+      }
+    ]
+  }
+}</pre>
+</div>
+</div>
+<!-- ==================== END Harness ==================== -->
+
+<!-- ==================== MCP ==================== -->
+<div id="page-mcp" class="page">
+<div class="section-title">🔌 MCP — Model Context Protocol</div>
+<div class="section-desc">AI 工具的「USB 接口」标准 — Anthropic 开源，行业正在采纳</div>
+
+<div class="card">
+  <div class="card-header"><span class="card-icon">❓</span><div class="card-title">解决什么问题？</div></div>
+  <p>每个 AI 工具（Claude/GPT/Gemini）连接外部系统的方式都不同，形成割裂的孤岛。MCP 解决「AI 工具与外部系统的标准化互联」问题——定义统一的服务器/客户端协议，让任何 AI 工具都能连接任何外部服务。</p>
+  <div class="highlight-box">
+    <p><strong>类比：</strong>MCP 就像 USB 标准——有了 USB，任何设备都能连接任何电脑。有了 MCP，任何 AI 都能连接任何工具。</p>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-header"><span class="card-icon">🏗️</span><div class="card-title">MCP 架构</div></div>
+  <div class="grid2">
+    <div class="highlight-box">
+      <div class="h3">MCP Server（服务端）</div>
+      <p>暴露工具和资源的服务，你来写。把你的 Java 业务接口包装成 MCP Server，让 AI 能调用。</p>
+      <ul>
+        <li>Tools：可调用的函数</li>
+        <li>Resources：可读取的数据</li>
+        <li>Prompts：可复用的提示词模板</li>
+      </ul>
+    </div>
+    <div class="highlight-box">
+      <div class="h3">MCP Client（客户端）</div>
+      <p>使用工具的 AI 应用。Claude Code、Cursor、Claude Desktop 都内置了 MCP Client。</p>
+      <ul>
+        <li>发现可用工具列表</li>
+        <li>调用工具并获取结果</li>
+        <li>读取资源数据</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-header"><span class="card-icon">💡</span><div class="card-title">常用 MCP Server</div></div>
+  <table class="compare-table">
+    <tr><th>MCP Server</th><th>能力</th><th>使用场景</th></tr>
+    <tr><td>filesystem</td><td>读写本地文件</td><td>代码编辑、文档处理</td></tr>
+    <tr><td>github</td><td>操作 GitHub API</td><td>PR 审查、Issue 管理</td></tr>
+    <tr><td>database</td><td>查询数据库</td><td>数据分析、运营查询</td></tr>
+    <tr><td>browser</td><td>控制浏览器</td><td>UI 测试、爬虫、截图</td></tr>
+    <tr><td>自定义</td><td>你的业务接口</td><td>让 AI 直接操作你的系统</td></tr>
+  </table>
+</div>
+</div>
+<!-- ==================== END MCP ==================== -->
+
+<!-- ==================== 企业级 RAG ==================== -->
+<div id="page-rag-enterprise" class="page">
+<div class="section-title">🏢 企业级 RAG 全链路 · 咔咔快</div>
+<div class="section-desc">随身 WiFi 智能客服 · 面试记忆宝典 · 名词先懂 → 知识点深挖 → 流程串成记忆树</div>
+
+<!-- ========== 知识点导航 ========== -->
+<div class="card" id="rag-nav">
+  <div class="card-header"><span class="card-icon">🗂️</span><div><div class="card-title">知识点导航</div><div class="card-subtitle">六大部分 · 点击直达</div></div></div>
+  <div class="h3" style="margin-top:4px">① 名词速查</div>
+  <div class="toc-links">
+    <a class="toc-link" href="#rag-glossary">名词速查总表</a>
+    <a class="toc-link" href="#g-core">核心流程类</a>
+    <a class="toc-link" href="#g-param">参数类(含取值范围)</a>
+    <a class="toc-link" href="#g-code">Spring AI 代码类</a>
+    <a class="toc-link" href="#g-eval">评估&进阶类</a>
+  </div>
+  <div class="h3">② 总览</div>
+  <div class="toc-links">
+    <a class="toc-link" href="#rag-overview">第一性原理+流程+13层</a>
+    <a class="toc-link" href="#rag-kaka-case">咔咔快架构案例</a>
+  </div>
+  <div class="h3">③ 知识点详解（★为重点深挖）</div>
+  <div class="toc-links">
+    <a class="toc-link" href="#rag-kp1">自研vsDify</a>
+    <a class="toc-link" href="#rag-kp2">文档解析OSS</a>
+    <a class="toc-link" href="#rag-kp3">★分片策略</a>
+    <a class="toc-link" href="#rag-kp4">Embedding</a>
+    <a class="toc-link" href="#rag-kp5">★向量库选型+字段</a>
+    <a class="toc-link" href="#rag-kp6">相似检索Advisor</a>
+    <a class="toc-link" href="#rag-kp7">Metadata多选</a>
+    <a class="toc-link" href="#rag-kp8">跨向量聚合</a>
+    <a class="toc-link" href="#rag-kp9">Text-to-SQL</a>
+    <a class="toc-link" href="#rag-kp10">★幻觉治理</a>
+    <a class="toc-link" href="#rag-kp11">★召回率+混合检索RRF</a>
+    <a class="toc-link" href="#rag-kp11b">★Rerank选型</a>
+    <a class="toc-link" href="#rag-kp12">来源追溯</a>
+    <a class="toc-link" href="#rag-kp13">文档更新三删</a>
+    <a class="toc-link" href="#rag-kp14">权限</a>
+    <a class="toc-link" href="#rag-kp15">图片处理</a>
+    <a class="toc-link" href="#rag-kp16">★准确率评估</a>
+    <a class="toc-link" href="#rag-kp17">对话基础</a>
+  </div>
+  <div class="h3">④ 前沿技术（2025-2026）</div>
+  <div class="toc-links">
+    <a class="toc-link" href="#rag-frontier">前沿名词表</a>
+    <a class="toc-link" href="#rag-agent-dev">Agent开发(Claude Code)</a>
+    <a class="toc-link" href="#rag-github">GitHub参考</a>
+  </div>
+  <div class="h3">⑤ 面试题 &nbsp;⑥ 记忆树</div>
+  <div class="toc-links">
+    <a class="toc-link" href="#rag-interview">面试题12问</a>
+    <a class="toc-link" href="#rag-memory-tree">🌳 整体汇总记忆树</a>
+  </div>
+</div>
+
+<!-- ==================== 第 1 部分：名词速查 ==================== -->
+<div class="card" id="rag-glossary">
+  <div class="card-header"><span class="card-icon">📖</span><div><div class="card-title">第 1 部分 · 英文名词速查</div><div class="card-subtitle">音标+谐音 → 中文 → 为何诞生/解决什么 → 取值范围 → 咔咔快怎么用</div></div></div>
+  <div class="alert tip">💡 面试心法：发音准是印象分。每抛一个名词，脑子里立刻联想咔咔快的「实名/充值/套餐/信号差」场景，<strong>不要只背词，要能举例</strong>。</div>
+
+  <div class="glossary-cat" id="g-core">🔵 核心流程类</div>
+  <table class="compare-table" style="font-size:0.83rem">
+    <tr><th>英文</th><th>音标 / 谐音</th><th>中文</th><th>一句话解释（为何诞生→解决什么）</th><th>咔咔快客服怎么用</th></tr>
+    <tr><td><strong>RAG</strong></td><td>/ræɡ/「瑞格」</td><td>检索增强生成</td><td>大模型不知道企业私有知识 → 先查资料再让 AI 照着答</td><td>App 问「怎么实名」→ 先搜《实名指南》片段 → 再生成回答</td></tr>
+    <tr><td><strong>LLM</strong></td><td>/el-el-em/「艾勒-艾勒-艾姆」</td><td>大语言模型</td><td>负责理解问题、生成文字的「大脑」</td><td>通义千问，作为客服对话的大脑</td></tr>
+    <tr><td><strong>Embedding</strong></td><td>/ɛmˈbɛdɪŋ/「恩-贝丁」</td><td>嵌入/向量化</td><td>关键词搜不到近义词 → 把文字变数字向量，能算「像不像」</td><td>「充值失败」和「支付不成功」向量距离近，能搜到一起</td></tr>
+    <tr><td><strong>Vector</strong></td><td>/ˈvɛktər/「维克托」</td><td>向量</td><td>Embedding 输出的那串高维数字</td><td>每个 FAQ 片段在 Milvus 存一条 1536 维向量</td></tr>
+    <tr><td><strong>Chunk</strong></td><td>/tʃʌŋk/「呛克」</td><td>分片</td><td>整篇喂超 Token 且检索不准 → 切成小段，检索的基本单位</td><td>《套餐说明》按「每个套餐一块」切，避免信息截断</td></tr>
+    <tr><td><strong>Top-K</strong></td><td>/tɒp-keɪ/「托普-开」</td><td>前 K 条</td><td>只取最相似的前 K 条结果，控制喂给 LLM 的量</td><td>一般 K=3~5；问套餐对比时可多选文档再检索</td></tr>
+    <tr><td><strong>Metadata</strong></td><td>/ˈmɛtədeɪtə/「麦塔-戴塔」</td><td>元数据</td><td>附在片段上的标签，用于过滤、追溯</td><td>source=实名指南.pdf；docType=FAQ；version=v2</td></tr>
+    <tr><td><strong>Advisor</strong></td><td>/ədˈvaɪzər/「阿德-外泽」</td><td>顾问/拦截器</td><td>Spring AI 的 AOP 拦截器，自动做 RAG/记忆/日志</td><td>QuestionAnswerAdvisor 自动检索+注入 Prompt</td></tr>
+    <tr><td><strong>Prompt</strong></td><td>/prɒmpt/「普朗普特」</td><td>提示词</td><td>发给大模型的指令+上下文</td><td>System：你是咔咔快客服；User：问题+检索片段</td></tr>
+    <tr><td><strong>Token</strong></td><td>/ˈtoʊkən/「托肯」</td><td>词元</td><td>模型处理文字的最小单位，也是计费单位</td><td>Top-K 太大 → Token 超限 → 回答变慢变贵</td></tr>
+    <tr><td><strong>Milvus</strong></td><td>/ˈmɪlvəs/「米尔-沃斯」</td><td>向量数据库</td><td>关系库做不了海量高维相似搜索 → 专业向量库 ANN 检索</td><td>存所有 FAQ 片段向量（教程选型，可换 pgvector）</td></tr>
+    <tr><td><strong>pgvector</strong></td><td>/piː-dʒiː-ˈvɛktər/「皮-基-维克托」</td><td>PG 向量扩展</td><td>不想另建库 → PostgreSQL 直接存向量</td><td>向量&lt;500万且已有 PG 可考虑（咔咔快 FAQ 量小够用）</td></tr>
+    <tr><td><strong>BM25</strong></td><td>/bi-ɛm-twɛnti-faɪv/「比-艾姆-25」</td><td>关键词匹配算法</td><td>向量搜不准精确词 → 用词频做关键词匹配</td><td>用户搜设备号 ICCID、错误码时，向量+BM25 混合更准</td></tr>
+    <tr><td><strong>Rerank</strong></td><td>/riːˈræŋk/「瑞-朗克」</td><td>重排序</td><td>双塔检索丢失细粒度交互 → 检索后再精排</td><td>先捞 20 条 → DashScope Rerank → 留 3 条给 LLM</td></tr>
+    <tr><td><strong>Hallucination</strong></td><td>/həˌluːsɪˈneɪʃən/「哈乐-西内申」</td><td>幻觉</td><td>大模型是概率机，没「不知道」概念 → 会编造</td><td>没搜到还乱报套餐价格 → Prompt 约束「不知道就说不知道」</td></tr>
+    <tr><td><strong>Recall</strong></td><td>/rɪˈkɔːl/「瑞-考」</td><td>召回率</td><td>正确答案 chunk 有没有被检索出来</td><td>问「加油包怎么买」必须召回《套餐说明》对应 chunk</td></tr>
+    <tr><td><strong>OSS</strong></td><td>/oʊ-ɛs-ɛs/「欧-艾斯-艾斯」</td><td>对象存储</td><td>向量库只存片段 → 原文件要持久化可下载</td><td>运营上传 FAQ 原文件，App 可下载/追溯来源</td></tr>
+    <tr><td><strong>Tika</strong></td><td>/ˈtiːkə/「提卡」</td><td>文档解析库</td><td>多格式各写一套 Reader 太麻烦 → Apache Tika 统一解析</td><td>后台上传 PDF/Word/MD，统一转文本再分片</td></tr>
+    <tr><td><strong>ChatMemory</strong></td><td>/tʃætˈmɛməri/「查特-麦莫瑞」</td><td>对话记忆</td><td>多轮对话要记住上句话</td><td>用户先说「充值失败」再说「那怎么办」→ 带历史</td></tr>
+    <tr><td><strong>Stream</strong></td><td>/striːm/「斯特里姆」</td><td>流式</td><td>等全文生成太慢 → 逐字返回打字机效果</td><td>App 客服用 .stream()，不用等全文生成完</td></tr>
+  </table>
+
+  <div class="glossary-cat" id="g-param">🟡 大模型与检索参数类（面试常问「参数调了什么」）</div>
+  <table class="compare-table" style="font-size:0.83rem">
+    <tr><th>参数</th><th>谐音/读法</th><th>作用</th><th>取值范围</th><th>咔咔快场景怎么设</th></tr>
+    <tr><td><strong>Temperature</strong></td><td>「坦-普瑞处」</td><td>控制回答随机性/创意，越高越发散</td><td>0.0 ~ 2.0（常用 0~1）</td><td>客服价格必须准确 → <strong>设 0</strong>，严格照资料说不发散</td></tr>
+    <tr><td><strong>TopP</strong></td><td>「托普-皮」</td><td>候选词概率累加阈值，控制词多样性，比 Temperature 平滑</td><td>0.0 ~ 1.0</td><td>设 0.9 即可，以 Temperature=0 为主控</td></tr>
+    <tr><td><strong>MaxTokens</strong></td><td>「麦克斯-托肯斯」</td><td>限制回答最大字数（1 Token≈1.5 中文字）</td><td>128 ~ 8192（依模型）</td><td>设 500 Token（约 300 字），防太长影响体验省费</td></tr>
+    <tr><td><strong>TopK（模型侧）</strong></td><td>「托普-开」</td><td>生成每个词时只考虑概率最高的 K 个候选</td><td>1 ~ 100+</td><td>和检索 TopK 不同！一般不单独调，与 Temperature 搭配</td></tr>
+    <tr><td><strong>Threshold</strong></td><td>「斯瑞享德」</td><td>向量相似度最低准入分，低于此分的 chunk 不返回</td><td>0.0 ~ 1.0</td><td><strong>中文建议 0.3~0.5</strong>，别设 0.8 否则召回为空触发幻觉</td></tr>
+    <tr><td><strong>similarityThreshold</strong></td><td>「西米-拉瑞提-斯瑞享德」</td><td>Spring AI SearchRequest 里的相似度阈值（同上）</td><td>0.0 ~ 1.0</td><td>.similarityThreshold(0.35) — 中文口语化提问分数偏低</td></tr>
+    <tr><td><strong>TopK（检索侧）</strong></td><td>「托普-开」</td><td>向量库返回的最多 K 条相似片段</td><td>1 ~ 50+</td><td>普通 FAQ .topK(3)；Rerank 粗筛 .topK(20)</td></tr>
+  </table>
+  <div class="glossary-cat" id="g-code">🟢 Spring AI 代码关键词（末列给代码片段+注释）</div>
+  <table class="compare-table" style="font-size:0.82rem">
+    <tr><th>代码关键词</th><th>读法</th><th>需要查什么(业务需求)</th><th>代码示例 + 注释</th></tr>
+    <tr><td><strong>ChatClient</strong></td><td>「查特-克赖恩特」</td><td>统一的对话入口，链式调用 API</td><td><code>chatClient.prompt().system().user().advisors().stream().content()</code></td></tr>
+    <tr><td><strong>QuestionAnswerAdvisor</strong></td><td>「克文申-安瑟-阿德外泽」</td><td>让大模型自动按问题查向量库再回答</td><td><code>new QuestionAnswerAdvisor(vectorStore, searchRequest)</code><br/>/* 放入 .advisors()，每次对话自动检索+注入 Prompt */</td></tr>
+    <tr><td><strong>RetrievalAugmentationAdvisor</strong></td><td>「瑞崔沃-奥格门特申」</td><td>基础 RAG 不够，需先改写口语化问题或多路检索</td><td><code>RetrievalAugmentationAdvisor.builder().queryTransformers(...).documentRetriever(...).build()</code><br/>/* 模块化 RAG 容器，可插拔改写器 */</td></tr>
+    <tr><td><strong>MessageChatMemoryAdvisor</strong></td><td>「麦斯-查特-麦莫瑞」</td><td>支持多轮对话，记住用户上句话</td><td><code>new MessageChatMemoryAdvisor(chatMemory, userId, 10)</code><br/>/* 第3参数=记忆窗口条数，防 Token 爆炸 */</td></tr>
+    <tr><td><strong>SimpleLoggerAdvisor</strong></td><td>「辛普-罗格」</td><td>开发测试时打印请求/响应排查</td><td><code>new SimpleLoggerAdvisor()</code> /* 生产慎用，会暴露对话内容 */</td></tr>
+    <tr><td><strong>SearchRequest</strong></td><td>「瑟奇-瑞奎斯特」</td><td>控制检索条数、阈值、Metadata 过滤</td><td><code>SearchRequest.builder().query(msg).topK(5).similarityThreshold(0.35).filterExpression(f).build()</code></td></tr>
+    <tr><td><strong>FilterExpression</strong></td><td>「菲尔特-艾克斯」</td><td>按 metadata 过滤检索范围（类似 SQL WHERE）</td><td><code>"source in ['实名指南.pdf','套餐说明.docx']"</code> /* 注意单引号包文件名 */</td></tr>
+    <tr><td><strong>TikaDocumentReader</strong></td><td>「提卡-道克门特-瑞德」</td><td>后台上传多格式文档需统一解析</td><td><code>new TikaDocumentReader(resource).get()</code> /* 自动写 metadata.source=文件名 */</td></tr>
+    <tr><td><strong>TokenTextSplitter</strong></td><td>「托肯-斯普利特」</td><td>长文档切块且不在句中断开</td><td><code>new TokenTextSplitter(400, 80, 5, 5000, true)</code><br/>/* (chunkSize, overlap, minLen, maxLen, keepSep) */</td></tr>
+    <tr><td><strong>VectorStore</strong></td><td>「维克托-斯托」</td><td>存片段入库 / 相似度搜索（Milvus/pg/Redis 统一抽象）</td><td><code>vectorStore.add(chunks)</code> // 自动 embed 入库<br/><code>vectorStore.similaritySearch(req)</code> // 检索</td></tr>
+    <tr><td><strong>DashScopeRerankAdvisor</strong></td><td>「达斯科普-瑞朗克」</td><td>向量排得不准，粗筛 20 条后精排留 5 条</td><td><code>new DashScopeRerankAdvisor(rerankModel, 20, 5)</code><br/>/* 粗筛20精排5，有性能代价，前面优化完再用 */</td></tr>
+    <tr><td><strong>RewriteQueryTransformer</strong></td><td>「瑞写特-克维瑞」</td><td>用户说「网好卡」搜不到，需改写成「网络信号差 解决方案」</td><td>配合 RetrievalAugmentationAdvisor，<strong>调 LLM 改写 query</strong>，需业务引导词</td></tr>
+    <tr><td><strong>@Transactional</strong></td><td>「崔赛克渗诺」</td><td>多操作要么全成功要么全回滚</td><td><code>@Transactional(rollbackFor=Exception.class)</code> /* 三删 MySQL+Milvus+OSS 一致 */</td></tr>
+    <tr><td><strong>Flux&lt;String&gt;</strong></td><td>「弗拉克斯」</td><td>App 要打字机效果，不等全文生成</td><td><code>.stream().content()</code> // 返回 Flux，前端 SSE 逐字接收</td></tr>
+  </table>
+
+  <div class="glossary-cat" id="g-eval">🔴 评估 &amp; 进阶类</div>
+  <table class="compare-table" style="font-size:0.83rem">
+    <tr><th>英文</th><th>读法</th><th>干什么（为何诞生→解决什么）</th><th>咔咔快客服怎么用</th></tr>
+    <tr><td><strong>RAGAS</strong></td><td>「瑞-加斯」</td><td>RAG 自动化评估框架，评 faithfulness/relevancy/recall</td><td>批量跑 50 条真实咨询，看「实名问答」正确率，&lt;90% 钉钉告警</td></tr>
+    <tr><td><strong>RelevancyEvaluator</strong></td><td>「瑞-勒万西-伊沃鲁阿特」</td><td>Spring AI 相关性评估，判断回答和上下文是否匹配</td><td>问「加油包怎么买」却检索到「退订政策」→ 评分 0=不通过，触发告警</td></tr>
+    <tr><td><strong>FactualityEvaluator</strong></td><td>「法克-图-阿利提-伊沃鲁阿特」</td><td>Spring AI 真实性评估，判断大模型是否产生幻觉</td><td>给正确 FAQ+标准答案，若评估失败说明大模型本身幻觉，考虑换模型</td></tr>
+    <tr><td><strong>HyDE</strong></td><td>「海德」</td><td>Hypothetical Document Embeddings，先造假答案再检索</td><td>用户问「信号差咋办」→ 先造「信号差解决方案是...」→ 用这个假文本检索更准</td></tr>
+    <tr><td><strong>RRF 融合</strong></td><td>「R-R-F」</td><td>Reciprocal Rank Fusion，把多路检索结果合并重排</td><td>向量检索 Top10 + BM25 检索 Top10 → RRF 算法合并 → 最终 Top5，综合两路之长</td></tr>
+    <tr><td><strong>Agentic RAG</strong></td><td>「阿-真-提克-瑞格」</td><td>Agent 多轮检索验证 RAG，复杂问题分步骤查</td><td>用户问「实名失败还充不了值」→ Agent 先查实名文档 → 再查充值文档 → 综合回答</td></tr>
+    <tr><td><strong>GraphRAG</strong></td><td>「格拉夫-瑞格」</td><td>知识图谱 + 向量，擅长实体关系推理</td><td>运营商-套餐-设备关系推理（远期方向，当前 FAQ 不需要）</td></tr>
+  </table>
+</div>
+<!-- ==================== 第 2 部分：总览 ==================== -->
+<div class="card" id="rag-overview">
+  <div class="card-header"><span class="card-icon">🧬</span><div><div class="card-title">第 2 部分 · 总览：RAG 解决什么？企业怎么设计？</div><div class="card-subtitle">复习引导 · 先有全局再钻细节</div></div></div>
+
+  <div class="h2">① 第一性原理：RAG 解决什么问题？</div>
+  <div class="principle-grid">
+    <div class="principle-box"><div class="label">问题</div><div class="value">大模型只背过公开训练数据，不知道咔咔快的套餐规则、实名流程、运营商政策</div></div>
+    <div class="principle-box p2"><div class="label">解法</div><div class="value">把业务文档变成可检索片段，用户提问时「翻书」找相关段落，让模型<strong>照着资料说</strong></div></div>
+    <div class="principle-box p3"><div class="label">为什么不用微调</div><div class="value">FAQ 常更新（套餐调价/新运营商）→ RAG 换文档即可；微调贵且慢，且无法溯源</div></div>
+  </div>
+
+  <div class="h2">② RAG 整体流程（两阶段）</div>
+  <div class="flow">
+    <div class="flow-step" style="border-color:var(--accent5)">【离线 Indexing】<br/>上传→解析→分片→向量化→入库</div>
+    <div class="flow-arrow">||</div>
+    <div class="flow-step" style="border-color:var(--accent2)">【在线 QA】<br/>提问→过滤→检索→拼Prompt→LLM→流式返回</div>
+  </div>
+
+  <div class="h2">③ 企业级 RAG 设计流程（13 层，面试可画）</div>
+  <table class="compare-table" style="font-size:0.84rem">
+    <tr><th>层</th><th>做什么</th><th>咔咔快客服对应 + 简短示例</th></tr>
+    <tr><td>1 数据源</td><td>选哪些文档入库</td><td>实名指南、充值说明、套餐/加油包、网络故障 FAQ</td></tr>
+    <tr><td>2 解析</td><td>PDF/Word→纯文本</td><td>Tika 解析 + OSS 存原文件，运营可下载追溯</td></tr>
+    <tr><td>3 分片</td><td>按语义切 chunk</td><td>FAQ 按问答对；套餐按 ## 标题每个套餐一块</td></tr>
+    <tr><td>4 Embedding</td><td>文本→向量</td><td>通义 text-embedding-v3（中文口语化更准）</td></tr>
+    <tr><td>5 向量库</td><td>存向量+metadata</td><td>Milvus（或 pgvector，见 KP5 选型）</td></tr>
+    <tr><td>6 检索</td><td>Top-K + 过滤</td><td>App 多选文档 → FilterExpression：source in [...]</td></tr>
+    <tr><td>7 Rerank</td><td>精排（可选）</td><td>文档多了再上 DashScopeRerankAdvisor(20,5)</td></tr>
+    <tr><td>8 Prompt</td><td>角色+约束+上下文</td><td>「只答 WiFi 相关，不知道就说不知道，Temperature=0」</td></tr>
+    <tr><td>9 生成</td><td>LLM 回答</td><td>通义千问 + .stream() 流式输出</td></tr>
+    <tr><td>10 来源</td><td>标注引用文件</td><td>SourceTraceAdvisor 拼「来源：《充值说明_v2.pdf》」</td></tr>
+    <tr><td>11 权限</td><td>谁能看哪些文档</td><td>Shiro RBAC：用户 FAQ 全员，代理商政策仅 AGENT/ADMIN</td></tr>
+    <tr><td>12 评估</td><td>准确率监控</td><td>RelevancyEvaluator / RAGAS + XXL-Job 周跑</td></tr>
+    <tr><td>13 运维</td><td>日志、告警、更新</td><td>SimpleLoggerAdvisor + 文档版本管理 + 钉钉告警</td></tr>
+  </table>
+
+  <div class="h2">④ 优化优先级口诀（必背 · 问答2 更新版）</div>
+  <div class="alert success">✅ <strong>数据准入（分片）→ Embedding 模型 → Metadata 隔离 → 阈值/Top-K → 查询改写 → 混合检索（BM25）→ 最后 Rerank → Prompt 防幻觉</strong>。不要一上来就 Rerank，那是前面优化完还不行才用的！</div>
+</div>
+
+<!-- ========== 咔咔快案例总览 ========== -->
+<div class="card" id="rag-kaka-case">
+  <div class="card-header"><span class="card-icon">📱</span><div><div class="card-title">案例：咔咔快 App 智能客服 RAG 架构</div><div class="card-subtitle">简历项目 · 面试主战场</div></div></div>
+  <div class="grid2">
+    <div>
+      <div class="h3">业务背景</div>
+      <p>随身 WiFi 物联网平台，用户高频问：实名认证流程、充值方式、加油包购买、网络信号差怎么办。人工客服压力大 → 用 RAG 覆盖 80%+ FAQ。</p>
+      <div class="h3">两端功能</div>
+      <ul>
+        <li><strong>管理后台：</strong>运营上传 FAQ 原文件（PDF/Word/MD）→ OSS 存储 → 自动分片向量化索引</li>
+        <li><strong>App 客户端：</strong>用户多选知识库文档（metadata）→ 输入问题 → 流式 AI 回答 + 来源引用</li>
+      </ul>
+    </div>
+    <div>
+      <div class="h3">技术栈（简历对齐）</div>
+      <p>Spring Boot + Spring AI + 通义千问 + Milvus + 阿里云 OSS + Redis（会话）+ Shiro 权限</p>
+      <div class="h3">端到端流程</div>
+      <div class="flow" style="flex-direction:column;align-items:stretch">
+        <div class="flow-step">运营上传《实名指南.pdf》→ Tika 解析 → 按 FAQ 分片 → Milvus</div>
+        <div class="flow-step">App 用户勾选「实名+充值」文档 → 问「怎么实名」→ Metadata 过滤检索</div>
+        <div class="flow-step">Top-3 片段 + System Prompt → 通义千问流式回答 → 展示来源</div>
+      </div>
+    </div>
+  </div>
+  <pre>// 【咔咔快】整体模块划分（面试画架构用）
+// kaka-ai-service/
+//   ├── admin/KnowledgeDocController    后台：上传/删除/列表
+//   ├── app/CustomerServiceController   App：多选文档 + 流式问答
+//   ├── service/KnowledgeIndexService   离线索引：OSS→Tika→分片→Milvus
+//   └── service/RagChatService          在线问答：过滤→检索→Advisor→LLM</pre>
+</div>
+<!-- ==================== 第 3 部分：知识点详解 ==================== -->
+<div class="card" style="background:linear-gradient(135deg,rgba(108,99,255,0.12),rgba(0,212,255,0.05))">
+  <div class="card-header"><span class="card-icon">🔬</span><div><div class="card-title">第 3 部分 · 知识点详细介绍（17 点，★为重点深挖）</div><div class="card-subtitle">每点：全称 → 解决什么 → 第一性原理 → 优化点 → 咔咔快案例 → 代码示例</div></div></div>
+  <div class="alert info">💡 答题模板：解决什么而生（加深记忆）→ 第一性原理（核心）→ 优化点（拆解流程）→ 咔咔快案例（结合实际/通俗）→ 代码示例（注释多点便于记忆）。</div>
+</div>
+
+<!-- KP1: 自研 vs Dify -->
+<div class="card" id="rag-kp1">
+  <div class="card-header"><span class="kp-num">1</span><div><div class="card-title">为什么自研 Spring AI 而不只用 Dify？</div><div class="card-subtitle">企业选型 · 面试必问</div></div></div>
+  <div class="kp-block">
+    <div class="kp-row"><span class="kp-label">解决问题</span><span>企业选型：低代码（Dify 拖拉拽，适合 PoC）vs 代码框架（Spring AI，RAG 逻辑内嵌 Java 服务）的权衡。</span></div>
+    <div class="kp-row"><span class="kp-label">第一性原理</span><span>RAG 不是独立 Demo，要嵌进现有 Java 微服务。Dify 适合验证，Spring AI 适合生产集成。</span></div>
+    <div class="kp-row"><span class="kp-label warn">优化点</span><span>
+      <ul style="margin:0;padding-left:16px">
+        <li>微服务集成：客服将来查「我的套餐余量」→ 直接注入 PackageQueryService，Dify 要远程调 N 个 HTTP</li>
+        <li>文档级权限：代理商 FAQ vs 用户 FAQ 分开，Metadata + Shiro RBAC 控制</li>
+        <li>自定义分片：按 docType 选策略；团队栈统一不额外维护 Python 运维</li>
+      </ul>
+    </span></div>
+    <div class="project-box">
+      <div class="proj-title">📱 咔咔快项目中怎么做</div>
+      <p>智能客服作为 <code>kaka-ai-service</code> 微服务，与套餐服务同 Nacos 注册。没选 Dify 是因为要和 Shiro 用户体系、OSS 文件管理、现有 MySQL 文档表一体化。</p>
+    </div>
+  </div>
+  <table class="compare-table" style="margin-top:8px;font-size:0.84rem">
+    <tr><th>维度</th><th>Dify（低代码）</th><th>Spring AI（自研）</th></tr>
+    <tr><td>上手速度</td><td>分钟级拖拽</td><td>需编码，但 Java 工程师熟悉</td></tr>
+    <tr><td>微服务集成</td><td>需 HTTP 远程调用</td><td>直接注入 Service Bean</td></tr>
+    <tr><td>文档级权限</td><td>内置但不灵活</td><td>Shiro RBAC + FilterExpression 完全自定义</td></tr>
+    <tr><td>事务控制</td><td>无</td><td>@Transactional 三删一致</td></tr>
+    <tr><td>团队维护</td><td>额外 Python/Docker 运维</td><td>Java 同一技术栈</td></tr>
+  </table>
+  <pre>// 【咔咔快】Spring AI 微服务集成（Dify 需远程 HTTP，Spring AI 直接注入）
+@RestController @RequiredArgsConstructor
+public class CustomerServiceController {
+    private final RagChatService ragChatService;      // 直接注入，无需 HTTP 调用
+    private final PackageQueryService packageService; // 套餐服务也在同一 JVM
+
+    @PostMapping("/app/cs/chat")
+    public Flux&lt;String&gt; chat(@RequestBody ChatRequest req) {
+        // 意图分类：FAQ 走 RAG，业务查询走 Tool Calling
+        return ragChatService.routeAndChat(req.getUserId(), req.getMessage(), req.getSources());
+    }
+}</pre>
+</div>
+
+<!-- KP2: 文档解析 -->
+<div class="card" id="rag-kp2">
+  <div class="card-header"><span class="kp-num">2</span><div><div class="card-title">文档解析与 OSS 存储</div><div class="card-subtitle">全称：Object Storage Service &amp; Apache Tika</div></div></div>
+  <div class="kp-block kp2">
+    <div class="kp-row"><span class="kp-label">解决问题</span><span>向量库只存文本片段，原文件必须持久化，运营和用户要能下载/追溯。Tika 统一解析 PDF/Word，不用写多套 Reader。</span></div>
+    <div class="kp-row"><span class="kp-label">第一性原理</span><span>物理文件与向量化数据分离存储，通过 Metadata 关联。</span></div>
+    <div class="kp-row"><span class="kp-label warn">优化点</span><span>OSS 用 UUID 文件名防覆盖；MySQL 存原文件名 + chunkId 列表；删除时三处一致 @Transactional；上传时写入 source、docType、ossUrl。</span></div>
+    <div class="project-box">
+      <div class="proj-title">📱 咔咔快项目中怎么做</div>
+      <p>运营上传《实名认证指南.pdf》→ 阿里云 OSS → Tika 读取 → 分片 → Milvus。App 不直接上传，只消费索引结果。</p>
+    </div>
+  </div>
+  <pre>// 【咔咔快】KnowledgeIndexService - 资料上传与向量化
+@Transactional(rollbackFor = Exception.class)
+public void uploadAndIndex(MultipartFile file, String docType) {
+    // 1. 上传 OSS，UUID 防重名覆盖
+    String ossKey = UUID.randomUUID() + getSuffix(file.getOriginalFilename());
+    String ossUrl = ossUtil.upload(ossKey, file.getInputStream());
+    // 2. Tika 解析（支持 pdf/docx/md）
+    List&lt;Document&gt; docs = new TikaDocumentReader(
+        new InputStreamResource(file.getInputStream())).get();
+    // 3. 补充 metadata：文件名、文档类型、OSS 地址
+    docs.forEach(d -&gt; {
+        d.getMetadata().put("source", file.getOriginalFilename());
+        d.getMetadata().put("docType", docType);  // FAQ / PACKAGE / NETWORK
+        d.getMetadata().put("ossUrl", ossUrl);
+    });
+    // 4. 分片 + 向量化 + 存 Milvus（add 内部自动 embed）
+    List&lt;Document&gt; chunks = faqSplitter.apply(docs);
+    vectorStore.add(chunks);
+    // 5. MySQL 持久化 chunkId 列表（删文档时用）
+    List&lt;String&gt; chunkIds = chunks.stream().map(Document::getId).toList();
+    docMapper.insert(KnowledgeDoc.builder().fileName(file.getOriginalFilename())
+        .ossUrl(ossUrl).docType(docType).chunkIds(String.join(",", chunkIds)).build());
+}</pre>
+</div>
+<!-- KP3: ★分片策略 -->
+<div class="card" id="rag-kp3">
+  <div class="card-header"><span class="kp-num">3</span><div><div class="card-title">★ 分片策略（Chunking）</div><div class="card-subtitle">全称：Text Chunking / Document Splitting · 企业 RAG 最关键</div></div></div>
+  <div class="alert warn">⚠️ <strong>踩坑：</strong>套餐说明若从中间切断，问「30 天加油包多少钱」可能搜不到完整价格，模型就编一个。代码写得好不如数据洗得好。</div>
+  <div class="kp-block kp3">
+    <div class="kp-row"><span class="kp-label">解决问题</span><span>大模型上下文有限，整篇喂进去超 Token 且检索精度极低。</span></div>
+    <div class="kp-row"><span class="kp-label">第一性原理</span><span>检索单位是 chunk。chunk 语义不完整 = 喂给 LLM 的材料是错的 = 回答必然错。</span></div>
+    <div class="kp-row"><span class="kp-label warn">优化点</span><span>
+      <ul style="margin:0;padding-left:16px">
+        <li>禁止纯固定长度切分！FAQ → 对话式分块；套餐 → Markdown 标题切；网络故障 → 按故障条目切</li>
+        <li>后台可提供分片预览，运营确认后再保存，甚至允许手动编辑片段内容</li>
+      </ul>
+    </span></div>
+    <div class="kp-row"><span class="kp-label tip">2026 新进展</span><span>
+      <ul style="margin:0;padding-left:16px">
+        <li><strong>chunk overlap 收益存疑：</strong>2026 年 1 月一项系统分析发现「重叠」这个最常见默认项并无可测收益，别盲目堆 overlap</li>
+        <li><strong>Contextual Retrieval（Anthropic）：</strong>给每个 chunk 前缀加「它在全文中的上下文」再向量化，召回率显著提升</li>
+        <li><strong>Late Chunking：</strong>先整篇过 Embedding 再切，效率高、保留全局语义（与 Contextual Retrieval 是效率 vs 效果的权衡）</li>
+      </ul>
+    </span></div>
+    <div class="project-box">
+      <div class="proj-title">📱 咔咔快项目中怎么做</div>
+      <p>上传时根据 <code>docType</code> 选分片器：<code>FAQ</code> 用问答对切；<code>PACKAGE</code> 按 Markdown 二级标题切（每个套餐独立 chunk）；<code>NETWORK</code> 按故障条目切。实名指南按「步骤 1/2/3」切，保证「怎么实名」一次拿全步骤。</p>
+    </div>
+  </div>
+  <table class="compare-table" style="font-size:0.84rem">
+    <tr><th>策略</th><th>适用</th><th>咔咔快文档</th></tr>
+    <tr><td>对话式分块</td><td>一问一答</td><td>《常见问题 FAQ》</td></tr>
+    <tr><td>Markdown 标题</td><td>按章节切</td><td>《套餐与加油包说明》</td></tr>
+    <tr><td>TokenTextSplitter</td><td>长文章保句完整</td><td>《运营商合作政策》</td></tr>
+    <tr><td>递归字符分块</td><td>通用兜底</td><td>未分类文档默认策略</td></tr>
+  </table>
+  <pre>// 【咔咔快】按 docType 选择分片策略
+public List&lt;Document&gt; splitByDocType(List&lt;Document&gt; docs, String docType) {
+    return switch (docType) {
+        // FAQ：较小 chunk，保证每个问答完整 (chunkSize,overlap,minLen,maxLen,keepSep)
+        case "FAQ"     -&gt; new TokenTextSplitter(400, 80, 5, 5000, true).apply(docs);
+        // 套餐：按 # / ## 标题切，每个套餐独立 chunk，价格不被切断
+        case "PACKAGE" -&gt; new MarkdownHeaderTextSplitter(List.of("#", "##")).apply(docs);
+        // 网络故障：按段落递归切
+        case "NETWORK" -&gt; new RecursiveCharacterTextSplitter("\n\n", 600, 50).apply(docs);
+        default        -&gt; faqSplitter.apply(docs);
+    };
+}</pre>
+</div>
+
+<!-- KP4: Embedding -->
+<div class="card" id="rag-kp4">
+  <div class="card-header"><span class="kp-num">4</span><div><div class="card-title">Embedding 向量化</div><div class="card-subtitle">全称：Text Embedding · 文本→向量的「翻译员」</div></div></div>
+  <div class="kp-block">
+    <div class="kp-row"><span class="kp-label">解决问题</span><span>「充值失败」和「支付没成功」文字不同但意思近，传统关键词搜不到，需要语义匹配。</span></div>
+    <div class="kp-row"><span class="kp-label">第一性原理</span><span>将文本映射到高维向量空间，语义相近的文本向量距离近（余弦相似度高）。</span></div>
+    <div class="kp-row"><span class="kp-label warn">优化点</span><span>中文客服用通义 text-embedding-v3（比 v1 更懂口语化）；vectorStore.add() 内部自动 embed；项目只配一个 EmbeddingModel Bean，保证入库和提问向量空间一致。</span></div>
+    <div class="project-box">
+      <div class="proj-title">📱 咔咔快项目中怎么做</div>
+      <p>Spring AI Alibaba 接入百炼 Embedding，与对话模型同账号。FAQ 入库和 App 提问<strong>必须用同一个模型</strong>，否则向量空间不一致检索会偏。</p>
+    </div>
+  </div>
+  <pre>// 【咔咔快】application.yml - Embedding 配置
+spring:
+  ai:
+    dashscope:
+      api-key: ${DASHSCOPE_API_KEY}
+      embedding:
+        options:
+          model: text-embedding-v3   # 中文语义更好
+
+// add() 时 Spring AI 内部：EmbeddingModel.embed(doc) → 写入 Milvus
+vectorStore.add(chunks);  // 无需手动调用 embed()</pre>
+</div>
+<!-- KP5: ★向量数据库选型 + 字段 -->
+<div class="card" id="rag-kp5">
+  <div class="card-header"><span class="kp-num">5</span><div><div class="card-title">★ 向量数据库选型 + 主要字段解释</div><div class="card-subtitle">Milvus / pgvector / Redis / ES 对比 · 为啥还要 MySQL · 怎么联动</div></div></div>
+  <div class="kp-block kp2">
+    <div class="kp-row"><span class="kp-label">解决问题</span><span>关系库 MySQL 做不了海量高维向量的快速相似度计算（ANN 检索）。</span></div>
+    <div class="kp-row"><span class="kp-label">第一性原理</span><span>通过 ANN（近似最近邻）算法，在海量向量中毫秒级找到距离最近的 K 条。选型看：数据量、是否已有基础设施、要不要混合关键词搜索。</span></div>
+  </div>
+  <table class="compare-table" style="font-size:0.84rem">
+    <tr><th>方案</th><th>适合场景</th><th>优点</th><th>缺点</th><th>咔咔快建议</th></tr>
+    <tr><td><strong>Milvus</strong></td><td>千万级+、专业向量场景</td><td>性能强、Spring AI 原生支持、HNSW/FLAT 可选</td><td>运维组件多，小项目略重</td><td>✅ 教程方案，面试这样说</td></tr>
+    <tr><td><strong>pgvector</strong></td><td>&lt;500万向量、已有 PG</td><td>不另建库，SQL+向量 JOIN，运维简单</td><td>超大规模延迟上升</td><td>FAQ 量小可考虑，简化运维</td></tr>
+    <tr><td><strong>Redis 向量</strong></td><td>热点缓存、毫秒级</td><td>极快，团队已用 Redis</td><td>内存贵，不适合主存储</td><td>作 L2 缓存热点 FAQ</td></tr>
+    <tr><td><strong>Elasticsearch</strong></td><td>已有 ES、要强关键词</td><td>BM25+向量混合成熟，KNN 向量查询</td><td>纯向量性能不如专用库</td><td>到账吧有 ES 经验，可混合搜 ICCID</td></tr>
+  </table>
+  <div class="alert info">💡 <strong>2025-2026 选型口诀：</strong>向量 &lt; 500 万且已有 Postgres → 先试 pgvector；要混合搜错误码/设备号 → ES；纯 RAG 知识库、要 Spring AI 开箱 → Milvus；Redis 只做缓存层。</div>
+
+  <div class="h2">Milvus Collection 主要字段解释（面试问「向量库存了啥」）</div>
+  <table class="compare-table" style="font-size:0.82rem">
+    <tr><th>字段名</th><th>类型</th><th>干什么的</th><th>咔咔快示例值</th></tr>
+    <tr><td><strong>id</strong></td><td>VARCHAR</td><td>每个 chunk 的唯一 ID（Spring AI 自动生成 UUID），删除时用它批量删</td><td>"a1b2c3d4-..."（也存在 MySQL 里）</td></tr>
+    <tr><td><strong>content</strong></td><td>VARCHAR</td><td>chunk 的原始文本，检索到后拼入 Prompt 让 LLM 看</td><td>"问：加油包怎么买？答：在 App 首页点击..."</td></tr>
+    <tr><td><strong>embedding</strong></td><td>FLOAT_VECTOR(1536)</td><td>content 的向量，1536 维浮点数组，ANN 检索靠它</td><td>[0.023, -0.145, 0.067, ...]（1536 个数字）</td></tr>
+    <tr><td><strong>metadata.source</strong></td><td>VARCHAR</td><td>来源文件名，FilterExpression 过滤靠它</td><td>"充值与加油包说明.docx"</td></tr>
+    <tr><td><strong>metadata.docType</strong></td><td>VARCHAR</td><td>文档业务类型，精确过滤时用</td><td>"FAQ" / "PACKAGE" / "NETWORK"</td></tr>
+    <tr><td><strong>metadata.ossUrl</strong></td><td>VARCHAR</td><td>OSS 原文件地址，来源追溯+用户下载用</td><td>"https://oss.kaka.com/faq/xxx.docx"</td></tr>
+    <tr><td><strong>metadata.version</strong></td><td>VARCHAR</td><td>文档版本，多版本共存时区分新旧</td><td>"v2025Q2"</td></tr>
+    <tr><td><strong>metadata.imageUrl</strong></td><td>VARCHAR</td><td>图片 URL（仅图片 chunk），来源追溯时返回图片给前端</td><td>"https://oss.kaka.com/img/shiming-step1.png"</td></tr>
+  </table>
+
+  <div class="h2">为什么用了 Milvus 还要用 MySQL？怎么配合？</div>
+  <div class="alert warn">⚠️ 向量库只存向量和 metadata，不擅长管理「文件的业务信息」（谁上传、何时上传、权限、怎么删）。两库各司其职。</div>
+  <div class="highlight-box">
+    <div class="h3">三库联动流程</div>
+    <ol>
+      <li><strong>上传时：</strong>MySQL 插入文件记录（原文件名+OSS地址）→ Milvus 插入多条 chunk（id+content+embedding+metadata）→ MySQL 更新记录存入所有 chunkId 列表</li>
+      <li><strong>检索时：</strong>App 传 sources 文件名列表 → Milvus FilterExpression 过滤 → 找到 chunk content 拼 Prompt</li>
+      <li><strong>删除时：</strong>MySQL 查出 chunkId 列表 → Milvus 批量删 → MySQL 删文件记录 → OSS 删物理文件（三删 @Transactional）</li>
+    </ol>
+  </div>
+  <pre>// 【咔咔快】Milvus 配置
+spring.ai.vectorstore.milvus.collection-name=kaka_faq_vectors
+spring.ai.vectorstore.milvus.index-type=FLAT   // FAQ 量小用 FLAT 精确检索，10万+ 改 HNSW
+
+// MySQL kaka_knowledge_doc 表（业务层管理文件）
+CREATE TABLE kaka_knowledge_doc (
+  id        BIGINT PRIMARY KEY AUTO_INCREMENT,
+  file_name VARCHAR(255) NOT NULL,   -- 原始文件名（显示用）
+  oss_url   VARCHAR(500) NOT NULL,   -- OSS 地址（下载用）
+  oss_key   VARCHAR(255) NOT NULL,   -- OSS Key（删除用）
+  doc_type  VARCHAR(50),             -- FAQ/PACKAGE/NETWORK
+  chunk_ids TEXT,                    -- Milvus chunkId 列表（删文件时批量删向量）
+  create_time DATETIME DEFAULT NOW()
+);</pre>
+</div>
+<!-- KP6: 相似检索 Advisor -->
+<div class="card" id="rag-kp6">
+  <div class="card-header"><span class="kp-num">6</span><div><div class="card-title">相似性检索与 Advisor</div><div class="card-subtitle">全称：QuestionAnswerAdvisor · App 问答核心</div></div></div>
+  <div class="flow">
+    <div class="flow-step" style="border-color:var(--accent5)">用户提问<br/><small>"怎么实名认证"</small></div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step" style="border-color:var(--accent2)">问题 Embedding<br/><small>text-embedding-v3</small></div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step" style="border-color:var(--accent3)">Milvus ANN 检索<br/><small>topK=3, threshold=0.35</small></div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step" style="border-color:var(--accent4)">Prompt 注入<br/><small>System+片段+问题</small></div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step" style="border-color:var(--accent2)">LLM 流式回答</div>
+  </div>
+  <div class="kp-block kp3" style="margin-top:10px">
+    <div class="kp-row"><span class="kp-label">解决问题</span><span>把用户问题变成向量，在 Milvus 找最相似的 K 段 FAQ，塞进 Prompt 让 LLM「开卷答题」。Advisor 自动完成检索+注入，不用手写。</span></div>
+    <div class="kp-row"><span class="kp-label">第一性原理</span><span>AOP 拦截器思想，在请求发给大模型前「插一脚」查向量库。</span></div>
+    <div class="kp-row"><span class="kp-label warn">优化点</span><span>topK 客服设 3~5；similarityThreshold 中文建议 0.3~0.5（别设 0.8+）；Temperature=0；allowEmptyContext=FORCE 搜不到强制提示「请拨热线」。QuestionAnswerAdvisor 简单直接，召回率要求高时换 RetrievalAugmentationAdvisor。</span></div>
+    <div class="project-box">
+      <div class="proj-title">📱 咔咔快项目中怎么做</div>
+      <p>App 问「实名认证需要什么材料」→ QuestionAnswerAdvisor 检索《实名指南》Top-3 → 拼入 Prompt → 通义千问流式返回。</p>
+    </div>
+  </div>
+  <pre>// 【咔咔快】RagChatService - 基础 RAG 问答
+SearchRequest searchRequest = SearchRequest.builder()
+    .query(userMessage).topK(3)          // 客服 FAQ 3 条够用，省 Token
+    .similarityThreshold(0.35).build();  // 中文分数偏低，阈值别太高
+return chatClient.prompt()
+    .system(KAKA_CS_SYSTEM_PROMPT)
+    .advisors(new QuestionAnswerAdvisor(vectorStore, searchRequest))
+    .user(userMessage).stream().content();  // App 流式打字机</pre>
+</div>
+
+<!-- KP7: Metadata 多选 -->
+<div class="card" id="rag-kp7">
+  <div class="card-header"><span class="kp-num">7</span><div><div class="card-title">知识库隔离 · App 多选 Metadata</div><div class="card-subtitle">全称：FilterExpression Metadata Filtering</div></div></div>
+  <div class="kp-block">
+    <div class="kp-row"><span class="kp-label">解决问题</span><span>全局搜 = 大海捞针。App 让用户勾选要查哪些文档，缩小检索范围。</span></div>
+    <div class="kp-row"><span class="kp-label">第一性原理</span><span>在向量检索前，先按标签（文件名、分类）做精确过滤，既快又准。</span></div>
+    <div class="kp-row"><span class="kp-label warn">优化点</span><span>单引号包文件名 <code>source in ['文件名.pdf']</code>；未选文档走普通对话；后端权限二次校验防抓包篡改；多维度组合 <code>source in [...] AND docType='FAQ'</code>。</span></div>
+    <div class="project-box">
+      <div class="proj-title">📱 咔咔快项目中怎么做</div>
+      <p>App 顶部多选《实名指南》《充值说明》。问「加油包怎么买」时只搜这两篇，避免搜到无关的代理商政策。</p>
+    </div>
+  </div>
+  <pre>// 【咔咔快】构建 FilterExpression
+if (req.getSources() != null && !req.getSources().isEmpty()) {
+    String filter = "source in [" + req.getSources().stream()
+        .map(s -&gt; "'" + s + "'").collect(joining(",")) + "]";
+    builder.filterExpression(filter);
+} else {
+    return plainChat(req.getMessage());  // 没选不走 RAG
+}</pre>
+</div>
+
+<!-- KP8: 跨向量聚合 -->
+<div class="card" id="rag-kp8">
+  <div class="card-header"><span class="kp-num">8</span><div><div class="card-title">跨向量聚合 · 打破 Top-K</div><div class="card-subtitle">教程三种方案</div></div></div>
+  <div class="kp-block kp2">
+    <div class="kp-row"><span class="kp-label">解决问题</span><span>「所有套餐价格」散布在 10 个 chunk，topK=5 只拿一半。LLM 也不擅长精确统计。</span></div>
+    <div class="kp-row"><span class="kp-label">第一性原理</span><span>Top-K 限制是结构性的，聚合查询该走数据库，不要强行 RAG。</span></div>
+    <div class="kp-row"><span class="kp-label warn">优化点</span><span>先问意图。①Metadata 隔离缩小到单文档；②Tool Calling 查 MySQL 精确；③分而治之按文档逐个检索（兜底，贵）。不要用 topK=50（Token 超限且注意力分散）。</span></div>
+    <div class="project-box">
+      <div class="proj-title">📱 咔咔快项目中怎么做</div>
+      <p>用户问「所有加油包价格」→ 方案①App 只勾选《套餐说明》；方案②路由到 Tool Calling 查 MySQL 套餐表（精确）。MVP 以方案①为主。</p>
+    </div>
+  </div>
+  <pre>// 【方案②咔咔快】Tool Calling 处理聚合查询
+@Component
+public class PackageQueryTool {
+    @Tool(description = "查询所有在售套餐和加油包价格列表")
+    public List&lt;PackageVO&gt; getAllPackages() {
+        return packageMapper.selectAllActive();  // 直接查 MySQL，精确
+    }
+}</pre>
+</div>
+
+<!-- KP9: Text-to-SQL -->
+<div class="card" id="rag-kp9">
+  <div class="card-header"><span class="kp-num">9</span><div><div class="card-title">Text-to-SQL · 结构化分流</div><div class="card-subtitle">全称：Text-to-SQL / Tool Calling</div></div></div>
+  <div class="kp-block kp4">
+    <div class="kp-row"><span class="kp-label">解决问题</span><span>「统计/所有/多少/我的」→ SQL 精确；「怎么操作/什么是」→ RAG 语义。Router 先分类再分流。</span></div>
+    <div class="kp-row"><span class="kp-label">第一性原理</span><span>让擅长的工具做擅长的事。LLM 生成参数调接口，比直接生成 SQL 更安全（无注入风险）。</span></div>
+    <div class="kp-row"><span class="kp-label warn">优化点</span><span>意图分类优先；Tool 描述要精准；不暴露数据库结构（用微服务接口封装）；结果再包装成自然语言。</span></div>
+    <div class="project-box">
+      <div class="proj-title">📱 咔咔快项目中怎么做</div>
+      <p>智能客服分层：FAQ 类（怎么实名）→ RAG；业务查询类（我的流量余额）→ Tool Calling 调套餐微服务。</p>
+    </div>
+  </div>
+  <pre>// 【咔咔快】意图路由（比纯 RAG 更贴业务）
+public Flux&lt;String&gt; chat(String userId, String message, List&lt;String&gt; sources) {
+    Intent intent = intentClassifier.classify(message);  // FAQ / BIZ_QUERY
+    if (intent == Intent.BIZ_QUERY) {
+        return chatClient.prompt().tools(packageTools, orderTools)  // 查 DB/API
+            .user(message).stream().content();
+    }
+    return ragChatService.streamChat(message, sources);  // RAG + 多选 metadata
+}</pre>
+</div>
+<!-- KP10: ★幻觉治理 -->
+<div class="card" id="rag-kp10">
+  <div class="card-header"><span class="kp-num">10</span><div><div class="card-title">★ 幻觉治理</div><div class="card-subtitle">全称：LLM Hallucination Mitigation · 客服绝不能乱报套餐价格</div></div></div>
+  <div class="kp-block">
+    <div class="kp-row"><span class="kp-label warn">两条路径</span><span>
+      <ul style="margin:0;padding-left:16px">
+        <li><strong>① 检索为空：</strong>threshold 设太高（如 0.8）导致没搜到，模型用训练数据瞎编套餐价格</li>
+        <li><strong>② 检索结果错误：</strong>分片太大把「退订」和「预定」切一块，模型基于错误材料「认真地」推理出错误答案</li>
+      </ul>
+    </span></div>
+    <div class="kp-row"><span class="kp-label">第一性原理</span><span>大模型是概率预测机，没有「不知道」的概念。必须通过强约束 Prompt 和兜底策略逼它说不知道。</span></div>
+  </div>
+  <div class="flow">
+    <div class="flow-step" style="border-color:var(--accent5)">检索为空<br/><small>threshold 太高/分片差</small></div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step" style="border-color:var(--accent2)">兜底强制返回<br/><small>「请拨打热线」</small></div>
+    <div class="flow-arrow">‖</div>
+    <div class="flow-step" style="border-color:var(--accent3)">检索结果错误<br/><small>分片太大/模型弱</small></div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step" style="border-color:var(--accent4)">Prompt 三红线 + Temperature=0</div>
+  </div>
+  <div class="kp-block" style="margin-top:10px">
+    <div class="kp-row"><span class="kp-label tip">三层治理</span><span>
+      <ul style="margin:0;padding-left:16px">
+        <li><strong>检索层：</strong>分片语义完整 + Metadata 多选缩范围 + similarityThreshold=0.35（别太高）+ Rerank 精排</li>
+        <li><strong>生成层：</strong>System Prompt 写死三条红线（严格基于资料 / 无资料回拨 400 / 只答 WiFi 相关）；Temperature=0 杜绝随机</li>
+        <li><strong>兜底层：</strong>allowEmptyContext=FORCE，检索为空直接返回提示不调大模型；敏感词前置拦截</li>
+      </ul>
+    </span></div>
+    <div class="project-box">
+      <div class="proj-title">📱 咔咔快项目中怎么做</div>
+      <p>System Prompt 硬性约束「严格基于知识库回答，无信息回复拨打 400-xxx，只答 WiFi 相关」。套餐价格幻觉从 10% 降到 0。</p>
+    </div>
+  </div>
+  <pre>// 【咔咔快】防幻觉 System Prompt
+private static final String KAKA_CS_SYSTEM_PROMPT = """
+    你是咔咔快随身WiFi智能客服助手。
+    1. 严格基于下方知识库内容回答，不要编造套餐价格、流量数值。
+    2. 若知识库无相关信息，回复："抱歉，暂无相关资料，请拨打客服热线 xxx。"
+    3. 只回答随身WiFi、实名、充值、套餐、网络相关问题。
+    4. 回答简洁，100字以内，并标注引用来源文件名。
+    """;
+// allowEmptyContext=FORCE: 检索为空时强制走 fallback，不给 LLM 发挥空间
+ChatOptions options = DashScopeChatOptions.builder()
+    .withTemperature(0.0)   // 固定输出，不随机
+    .withMaxToken(500).build();</pre>
+</div>
+<!-- KP11: ★召回率全链路 + 混合检索 RRF -->
+<div class="card" id="rag-kp11">
+  <div class="card-header"><span class="kp-num">11</span><div><div class="card-title">★ 召回率全链路优化（含混合检索 RRF 与 HyDE）</div><div class="card-subtitle">链路任一环断裂，后面都补不回来 · 先数据后 Rerank</div></div></div>
+  <div class="detail-flow">
+    <div class="flow-step" style="border-color:var(--accent3)">① 数据准入<br/><small>分片+清洗</small></div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step" style="border-color:var(--accent4)">② Embedding<br/><small>v3 模型</small></div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step" style="border-color:var(--accent2)">③ 向量库<br/><small>阈值/索引/Metadata</small></div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step" style="border-color:var(--accent5)">④ 检索<br/><small>改写+混合+Rerank</small></div>
+  </div>
+  <div class="kp-block kp2">
+    <div class="kp-row"><span class="kp-label">第一性原理</span><span>召回率 = 正确答案 chunk 被检索到的概率。链路任何一环断裂，后面 Rerank/Prompt 都无法补救。<strong>先优化数据，最后才 Rerank。</strong></span></div>
+    <div class="kp-row"><span class="kp-label warn">优化优先级口诀</span><span>✅ 数据准入（分片）→ Embedding 模型 → Metadata 隔离 → 阈值/Top-K → <strong>查询改写</strong> → <strong>混合检索（BM25）</strong> → 最后 Rerank → Prompt 防幻觉</span></div>
+  </div>
+
+  <div class="h2">深挖：HyDE 和 RetrievalAugmentationAdvisor 是一回事么？</div>
+  <div class="kp-block kp3">
+    <div class="kp-row"><span class="kp-label tip">HyDE</span><span><strong>是一种思想</strong>（Hypothetical Document Embeddings）：用户提问太短/太口语化直接搜不到 → 先让 LLM 编一个「假设答案」，用假答案去搜，因为「答案找答案」比「问题找答案」语义更匹配。</span></div>
+    <div class="kp-row"><span class="kp-label tip">RAAdvisor</span><span><strong>是 Spring AI 的模块化容器 Advisor</strong>，可以装各种 Transformer。</span></div>
+    <div class="kp-row"><span class="kp-label">两者关系</span><span>你可以在 <code>RetrievalAugmentationAdvisor</code> 里放一个 <code>RewriteQueryTransformer</code> 来实现类似 HyDE 的效果（<strong>确实是调模型改写</strong>，需结合业务引导词）。所以二者不是一回事，是「思想」与「实现容器」的关系。</span></div>
+    <div class="kp-row"><span class="kp-label warn">要放进口诀么</span><span><strong>非常有必要！</strong>它属于检索阶段的「查询改写」步骤，是解决中文口语化提问召回率低的核心手段。</span></div>
+  </div>
+
+  <div class="h2">深挖：BM25 打分机制与 2026 混合检索（RRF）</div>
+  <div class="kp-block">
+    <div class="kp-row"><span class="kp-label">BM25 适用场景</span><span>向量搜语义强但搜不了精确词。咔咔快用户搜「设备号 ICCID 898601...」「错误码 E-404」「P10 套餐编号」时，向量模型把它当普通数字根本搜不准；BM25 擅长精确关键词匹配。</span></div>
+    <div class="kp-row"><span class="kp-label">BM25 怎么打分</span><span>基于 <strong>词频 TF</strong>（词在文档出现次数）× <strong>逆文档频率 IDF</strong>（词在所有文档的稀有度）。一个词在少数文档频繁出现 → 得分高。并做<strong>文档长度归一化</strong>，长文档不因字多占便宜。</span></div>
+    <div class="kp-row"><span class="kp-label tip">为什么用 RRF 不加权平均</span><span>向量输出 cosine [-1,1]，BM25 输出无界正整数，直接加权 BM25 永远主导。RRF 只看排名位置，不看绝对分数，彻底绕开分数不可比。</span></div>
+    <div class="kp-row"><span class="kp-label tip">RRF 公式 + k 值</span><span><strong>score(d) = Σ 1/(k + rank(d))</strong>。<strong>k=60 是默认基线</strong>（Elasticsearch/业界标准，无需调参，实测较纯向量 +14% 召回）；k=30~40 偏向 Top-1 精准度。两路都排前面的文档综合分最高。</span></div>
+    <div class="kp-row"><span class="kp-label warn">Weaviate 陷阱</span><span>v1.24 后默认融合算法从 RankedFusion 变为 RelativeScoreFusion，<strong>不显式指定会静默变更搜索质量</strong>。咔咔快用 Milvus 无此问题。</span></div>
+  </div>
+
+  <div class="project-box">
+    <div class="proj-title">📱 咔咔快项目中怎么做</div>
+    <p><strong>MVP：</strong>只用 Milvus 向量 + Metadata 多选 + threshold=0.35，FAQ 量小够用。<br/>
+    <strong>精确词：</strong>用户搜「ICCID」「套餐编号」→ 加 ES BM25 混合检索，向量 Top10 + BM25 Top10 → RRF(k=60) 合并 Top5。<br/>
+    <strong>口语化：</strong>用户说「网好卡」→ RewriteQueryTransformer 改写为「网络信号差 解决方案」→ 再检索。</p>
+  </div>
+
+  <div class="h2">实战排查：问「退订费用」却检索到「预定费用」</div>
+  <div class="step-box"><div class="step-num">Step 1 · 发现</div><p>相关性评估 0 分 → 召回失败（正确 chunk 没搜到，LLM 基于错误 chunk 乱答）</p></div>
+  <div class="step-box"><div class="step-num">Step 2 · 按优化顺序排查</div>
+    <ul>
+      <li>查分片：「退订」和「预定」是否同一 chunk？→ 分片太大，拆开</li>
+      <li>查阈值：similarityThreshold 太高（0.8）？→ 降到 0.35 重试</li>
+      <li>查 Metadata：加 docType 过滤缩小范围；最后才考虑升级 Embedding 模型</li>
+    </ul>
+  </div>
+  <div class="step-box"><div class="step-num">Step 3 · 修复结果</div><p>优化分片（退订独立 chunk）+ 降阈值 + Metadata 过滤 → 召回率 60% → 90%+</p></div>
+
+  <pre>// 【Step1】降阈值 + Metadata 过滤（效果最显著，先做）
+SearchRequest sr = SearchRequest.builder().query(userMessage).topK(5)
+    .similarityThreshold(0.35)   // 中文别设太高！从 0.35 开始调
+    .filterExpression("source in ['" + String.join("','", sources) + "']").build();
+
+// 【Step2】查询改写（口语化问题效果差时加，调 LLM 改写 = 类 HyDE）
+Advisor ragAdvisor = RetrievalAugmentationAdvisor.builder()
+    .queryTransformers(RewriteQueryTransformer.builder()
+        .chatClientBuilder(chatClientBuilder)
+        .promptTemplate("将用户口语化问题改写为FAQ检索关键词，业务领域：随身WiFi实名充值套餐网络")
+        .build())
+    .documentRetriever(VectorStoreDocumentRetriever.builder()
+        .vectorStore(vectorStore).topK(5).similarityThreshold(0.35).build())
+    .build();
+
+// 【Step4·进阶】混合检索（ES BM25 + Milvus 向量，RRF k=60 融合）
+List&lt;Document&gt; vectorDocs = vectorStore.similaritySearch(
+    SearchRequest.builder().query(query).topK(10).similarityThreshold(0.3).build());
+List&lt;Document&gt; bm25Docs = elasticsearchService.keywordSearch(query, 10);  // ES 全文搜
+List&lt;Document&gt; merged = rrfMerge(vectorDocs, bm25Docs, 60, 5);  // RRF(k=60) 合并取 Top5</pre>
+</div>
+
+<!-- KP11b: ★Rerank 选型 -->
+<div class="card" id="rag-kp11b">
+  <div class="card-header"><span class="kp-num">11+</span><div><div class="card-title">★ Rerank 重排序：优化与模型选型</div><div class="card-subtitle">粗排+精排 · 2026 Reranker 选型</div></div></div>
+  <div class="kp-block kp3">
+    <div class="kp-row"><span class="kp-label">为啥要粗排+精排</span><span>向量检索（双塔模型）为了快，把问题和文档<strong>独立压缩</strong>，丢失了词与词间的精细交互。先捞 20 条，Rerank（<strong>Cross-Encoder 把 Q 和 D 拼一起算分</strong>）逐条精细打分，留 5 条。牺牲延迟换极高精度。</span></div>
+    <div class="kp-row"><span class="kp-label warn">使用原则</span><span>不要一上来就用！先把分片和阈值优化好。咔咔快 FAQ &lt;10 万 chunk，Metadata 多选 + threshold=0.35 够用，文档量上来再考虑 Rerank。2026 共识：<strong>召回高但精度低时上 Rerank 有效；召回本身就低时上 Rerank 反而有害</strong>。</span></div>
+  </div>
+  <div class="h2">2026 Reranker 选型</div>
+  <table class="compare-table" style="font-size:0.84rem">
+    <tr><th>模型</th><th>特点</th><th>选型建议</th></tr>
+    <tr><td><strong>DashScopeRerankModel</strong></td><td>阿里云，Spring AI Alibaba 原生支持</td><td>✅ 咔咔快推荐，与通义同账号</td></tr>
+    <tr><td><strong>Cohere Rerank 3.5</strong></td><td>支持表格/JSON/代码，~4K 上下文</td><td>生产基线，商业 API</td></tr>
+    <tr><td><strong>Voyage rerank-2.5</strong></td><td>32K 超长上下文 + 指令跟随</td><td>长文档、可在 query 前附自然语言指令引导精排</td></tr>
+    <tr><td><strong>BGE-Reranker-v2-m3</strong></td><td>开源、多语言、中文强</td><td>自部署省成本首选（2026 开源主流）</td></tr>
+    <tr><td><strong>Jina Reranker v2 / mxbai</strong></td><td>开源、轻量、低延迟</td><td>边缘/低延迟场景</td></tr>
+  </table>
+  <pre>// 【咔咔快】Rerank（前面优化后还不够时再加，有性能代价）
+chatClient.prompt()
+    .advisors(
+        new QuestionAnswerAdvisor(vectorStore, searchRequest),
+        new DashScopeRerankAdvisor(dashScopeRerankModel, 20, 5)  // 粗筛20 → 精排留5
+    ).user(question).call().content();</pre>
+</div>
+<!-- KP12: 来源追溯 -->
+<div class="card" id="rag-kp12">
+  <div class="card-header"><span class="kp-num">12</span><div><div class="card-title">文件来源追溯</div><div class="card-subtitle">全称：Source Traceability Custom Advisor</div></div></div>
+  <div class="kp-block kp3">
+    <div class="kp-row"><span class="kp-label">解决问题</span><span>QuestionAnswerAdvisor 检索的 chunk 存在 context 里，但默认发给 LLM 的 Prompt 不含 metadata.source。用户不知道答案出自哪。</span></div>
+    <div class="kp-row"><span class="kp-label">第一性原理</span><span>通过自定义 Advisor，在 Prompt 里拼入来源文件名，让 LLM 在回答中标注。</span></div>
+    <div class="kp-row"><span class="kp-label warn">优化点</span><span>Advisor 执行顺序必须在 QuestionAnswerAdvisor 之后（<code>@Order(LOWEST_PRECEDENCE - 1)</code>）；distinct 去重；可存 ossUrl 让前端展示下载链接；metadata.version 标注「来源 v2025Q2」。</span></div>
+    <div class="project-box">
+      <div class="proj-title">📱 咔咔快项目中怎么做</div>
+      <p>App 回答末尾显示「来源：《实名认证指南.pdf》」，用户可点下载 OSS 原文件。运营更新 FAQ 后可区分 v1/v2。</p>
+    </div>
+  </div>
+  <pre>// 【咔咔快】SourceTraceAdvisor - 放在 QA Advisor 之后（order = MAX-1）
+@Component
+@Order(Ordered.LOWEST_PRECEDENCE - 1)
+public class SourceTraceAdvisor implements CallAdvisor {
+    @Override
+    public ChatClientResponse adviseCall(ChatClientRequest req, CallAdvisorChain chain) {
+        List&lt;Document&gt; docs = (List&lt;Document&gt;) req.context()
+            .get(QuestionAnswerAdvisor.RETRIEVED_DOCUMENTS);  // 取检索到的 chunk
+        String sources = docs.stream()
+            .map(d -&gt; d.getMetadata().get("source").toString())
+            .distinct().collect(joining("、"));  // 去重
+        ChatClientRequest enriched = req.mutate()
+            .prompt(req.prompt().user(req.prompt().getUserMessage()
+                .getText() + "\n[参考来源: " + sources + "]")).build();
+        return chain.nextCall(enriched);
+    }
+}</pre>
+</div>
+
+<!-- KP13: 文档更新 -->
+<div class="card" id="rag-kp13">
+  <div class="card-header"><span class="kp-num">13</span><div><div class="card-title">文档更新策略</div><div class="card-subtitle">三删一致性 · 多版本共存</div></div></div>
+  <div class="kp-block">
+    <div class="kp-row"><span class="kp-label">解决问题</span><span>向量库旧 chunk 不自动清理会导致回答混乱。传错文档要删，套餐调价要更新。</span></div>
+    <div class="kp-row"><span class="kp-label">第一性原理</span><span>向量库 chunk 和 MySQL 文件记录、OSS 原文件是三个独立存储，必须同步。@Transactional 保证三删要么全成功要么全回滚。</span></div>
+    <div class="kp-row"><span class="kp-label warn">优化点</span><span>三删顺序 MySQL → Milvus → OSS（OSS 无事务，删失败异步补偿）；不直接改 chunk 而是删旧批+上传新版；保留旧版用 metadata.version 区分；批量删 vectorStore.delete(List)。</span></div>
+    <div class="project-box">
+      <div class="proj-title">📱 咔咔快项目中怎么做</div>
+      <p><strong>传错文档：</strong>MySQL 查 chunkIds → 三删。<strong>套餐调价：</strong>传《套餐说明_v2025Q2.pdf》保留旧版 → App 多选新旧对比。</p>
+    </div>
+  </div>
+  <pre>// 【咔咔快】删除文档 - 三表一致
+@Transactional(rollbackFor = Exception.class)
+public void deleteDoc(Long docId) {
+    KnowledgeDoc doc = docMapper.selectById(docId);
+    docMapper.deleteById(docId);                                  // 1. MySQL
+    vectorStore.delete(Arrays.asList(doc.getChunkIds().split(",")));  // 2. Milvus 批量删
+    ossUtil.delete(doc.getOssKey());                              // 3. OSS 物理文件
+}</pre>
+</div>
+
+<!-- KP14: 权限 -->
+<div class="card" id="rag-kp14">
+  <div class="card-header"><span class="kp-num">14</span><div><div class="card-title">权限控制</div><div class="card-subtitle">全称：Shiro RBAC · 前后端双校验</div></div></div>
+  <div class="kp-block">
+    <div class="kp-row"><span class="kp-label">解决问题</span><span>不同角色能看的知识库不同。普通用户看 FAQ，代理商看政策。</span></div>
+    <div class="kp-row"><span class="kp-label">第一性原理</span><span>前端展示过滤只是 UX，安全靠后端。攻击者可抓包传任意 sources，后端必须二次校验。</span></div>
+    <div class="kp-row"><span class="kp-label warn">优化点</span><span>建权限关联表 doc_permission；RAG 接口层做 validateSources；ADMIN 跳过校验；敏感文档访问记审计日志。</span></div>
+    <div class="project-box">
+      <div class="proj-title">📱 咔咔快项目中怎么做</div>
+      <p>用户 FAQ 全员可见；代理商政策仅 AGENT/ADMIN 可见。App 传 sources 后端校验是否在权限内，防抓包绕过。</p>
+    </div>
+  </div>
+  <pre>// 【咔咔快】后端二次校验
+public void validateSources(Long userId, List&lt;String&gt; sources) {
+    Set&lt;String&gt; allowed = docPermissionService.getAllowedFileNames(userId);
+    if (!allowed.containsAll(sources)) {
+        throw new BusinessException("无权访问所选知识库文档");
+    }
+}</pre>
+</div>
+
+<!-- KP15: 图片处理 -->
+<div class="card" id="rag-kp15">
+  <div class="card-header"><span class="kp-num">15</span><div><div class="card-title">文档图片处理</div><div class="card-subtitle">全称：Multimodal Document Processing · 实名截图</div></div></div>
+  <div class="kp-block">
+    <div class="kp-row"><span class="kp-label">解决问题</span><span>PDF 含截图（实名步骤图），Tika 默认只提取文字，图片信息丢失。</span></div>
+    <div class="kp-row"><span class="kp-label">第一性原理</span><span>向量库检索文本，图片无法直接检索。通过多模态大模型（通义 VL）把图片转为「描述文本」，文本向量化检索，imageUrl 存 metadata 跟着 chunk 走。</span></div>
+    <div class="kp-row"><span class="kp-label warn">优化点</span><span>用 PDFBox 而非 Tika 提图；VL 描述 Prompt 引导「按步骤描述界面按钮」；imageUrl 存 metadata 供前端展示；控制 VL 调用并发成本。</span></div>
+    <div class="project-box">
+      <div class="proj-title">📱 咔咔快项目中怎么做</div>
+      <p>《实名操作指南》含 App 截图 → PDFBox 提图 → OSS → 通义 VL 生成描述「点击首页实名入口…」→ 描述入库 metadata.imageUrl，用户问「实名入口在哪」返回文字+截图 URL。</p>
+    </div>
+  </div>
+  <pre>// 【咔咔快】图片 chunk 处理（简化版）
+for (int page = 0; page &lt; pdf.getNumberOfPages(); page++) {
+    BufferedImage img = renderer.renderImageWithDPI(page, 150);
+    String imageUrl = ossUtil.uploadImage("img/" + UUID.randomUUID() + ".png", img);
+    String desc = vlChatClient.prompt()
+        .user(u -&gt; u.text("请描述图中的App操作界面，重点说步骤和按钮位置")
+            .media(MimeType.IMAGE_PNG, new UrlResource(imageUrl))).call().content();
+    Document imgDoc = new Document(desc);
+    imgDoc.getMetadata().put("imageUrl", imageUrl);  // 前端展示用
+    imgDocs.add(imgDoc);
+}</pre>
+</div>
+<!-- KP16: ★准确率评估 -->
+<div class="card" id="rag-kp16">
+  <div class="card-header"><span class="kp-num">16</span><div><div class="card-title">★ 准确率评估</div><div class="card-subtitle">全称：RAG Evaluation（RAGAS / Spring AI Evaluator）</div></div></div>
+  <div class="kp-block kp2">
+    <div class="kp-row"><span class="kp-label">解决问题</span><span>RAG 上线不等于高质量。AI 的 bug 不是报错而是回答不准，需要量化评估和告警。</span></div>
+    <div class="kp-row"><span class="kp-label">第一性原理</span><span>RAG 质量不靠感觉，靠数据。测试集必须用真实用户问的问题，不能用工程师自造题（用户说「网好卡」工程师写「信号差」，语义差距导致评估失真）。</span></div>
+  </div>
+  <div class="h2">评估体系（干什么 + 项目示例两列直观）</div>
+  <table class="compare-table" style="font-size:0.83rem">
+    <tr><th>评估器</th><th>干什么</th><th>咔咔快项目示例</th></tr>
+    <tr><td><strong>RelevancyEvaluator</strong></td><td>判断问题与检索上下文是否相关，0=不通过</td><td>问「加油包怎么买」却检索到「退订政策」→ 评分 0=不通过，触发告警</td></tr>
+    <tr><td><strong>FactualityEvaluator</strong></td><td>判断 LLM 回答是否基于上下文，检测幻觉</td><td>给正确 FAQ+标准答案，若评估失败说明大模型本身幻觉，考虑换模型</td></tr>
+    <tr><td><strong>RAGAS 框架</strong></td><td>自动化评 faithfulness（忠实度）+ answer_relevancy + context_recall</td><td>批量跑 50 条实名/充值问题，三维度打分</td></tr>
+    <tr><td><strong>召回率人工评估</strong></td><td>标注 50~100 条「问题→正确 chunkId」，检索时判断是否包含正确 ID</td><td>标注「加油包怎么买」对应《套餐说明》chunk 是否被召回</td></tr>
+  </table>
+  <div class="kp-block" style="margin-top:10px">
+    <div class="kp-row"><span class="kp-label warn">告警机制</span><span>XXL-Job 每周跑一次，<code>&lt;90%</code> 钉钉告警。低分逐环节反推：先查分片 → 再查阈值 → 再看 Prompt → 最后看模型本身幻觉。90% 问题在数据。</span></div>
+    <div class="project-box">
+      <div class="proj-title">📱 咔咔快项目中怎么做</div>
+      <p>准备 50 条真实用户问题 + 标准答案 + 期望 chunkId。XXL-Job 每周跑 RelevancyEvaluator，准确率 &lt;90% 钉钉告警。MongoDB 存每轮 question/context/answer 便于复盘。</p>
+    </div>
+  </div>
+  <pre>// 【咔咔快】批量评估
+RelevancyEvaluator eval = new RelevancyEvaluator(chatClient);
+for (TestCase tc : faqTestSet) {
+    String answer = ragChatService.chat(tc.question, tc.sources);
+    List&lt;Document&gt; ctx = vectorStore.similaritySearch(tc.question);
+    EvaluationResponse r = eval.evaluate(new EvaluationRequest(tc.question, ctx, answer));
+    if (!r.isPass()) log.warn("FAIL: {} reason={}", tc.question, r);
+}</pre>
+</div>
+
+<!-- KP17: 对话基础 -->
+<div class="card" id="rag-kp17">
+  <div class="card-header"><span class="kp-num">17</span><div><div class="card-title">对话基础 · 记忆/日志/敏感词/流式</div><div class="card-subtitle">全称：Chat Pipeline（Memory, Logging, Safety, Streaming）</div></div></div>
+  <div class="flow">
+    <div class="flow-step" style="border-color:var(--accent5)">敏感词前置<br/><small>本地拦截不耗 Token</small></div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step" style="border-color:var(--accent2)">SimpleLoggerAdvisor<br/><small>日志</small></div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step" style="border-color:var(--accent3)">MemoryAdvisor<br/><small>userId 隔离</small></div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step" style="border-color:var(--accent4)">SourceTrace<br/><small>来源</small></div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step" style="border-color:var(--accent2)">QA Advisor<br/><small>RAG</small></div>
+  </div>
+  <div class="kp-block" style="margin-top:10px">
+    <div class="kp-row"><span class="kp-label">第一性原理</span><span>Advisor 是 AOP 思想，每个横切关注点（日志/记忆/安全/RAG）独立 Advisor，通过 order 有序执行，互不耦合。</span></div>
+    <div class="kp-row"><span class="kp-label warn">优化点</span><span>敏感词本地拦截不消耗 Token；ChatMemory 按 userId 隔离，窗口控制防 Token 爆炸；SimpleLoggerAdvisor 生产控制日志级别；流式 .stream() 体验好；System Prompt 动态注入日期判断套餐活动时效。</span></div>
+    <div class="project-box">
+      <div class="proj-title">📱 咔咔快项目中怎么做</div>
+      <p>ChatMemory 按 userId 隔离保留 10 轮；敏感词表拦截辱骂/竞品词；stream 流式；System Prompt 注入当前日期。</p>
+    </div>
+  </div>
+  <pre>// 【咔咔快】完整 Advisor 链
+public Flux&lt;String&gt; streamChat(Long userId, String msg, SearchRequest sr) {
+    if (sensitiveWordService.contains(msg))
+        return Flux.just("您的输入包含不当内容，请修改后重试");
+    return chatClient.prompt().system(KAKA_CS_SYSTEM_PROMPT)
+        .advisors(
+            new SimpleLoggerAdvisor(),                              // 日志排查
+            new MessageChatMemoryAdvisor(chatMemory, userId, 10),   // 多轮记忆
+            new SourceTraceAdvisor(),                               // 来源
+            new QuestionAnswerAdvisor(vectorStore, sr))             // RAG
+        .user(msg).stream().content();
+}</pre>
+</div>
+<!-- ==================== 第 4 部分：前沿技术 ==================== -->
+<div class="card" id="rag-frontier">
+  <div class="card-header"><span class="card-icon">🌐</span><div><div class="card-title">第 4 部分 · 扩展前沿技术详解（2025-2026 进阶必问）</div><div class="card-subtitle">面试官问未来方向，这些名词让你脱颖而出</div></div></div>
+
+  <div class="glossary-cat">📚 RAG 进化路径名词表</div>
+  <table class="compare-table" style="font-size:0.82rem">
+    <tr><th>英文 + 音标谐音</th><th>中文</th><th>为何诞生 / 解决什么 / 怎么解决</th><th>咔咔快客服怎么用</th></tr>
+    <tr><td><strong>Modular RAG</strong>「莫-久-乐-瑞格」</td><td>模块化 RAG</td><td>固定直线链路（检索→拼Prompt→生成）无法适应复杂业务 → 把流程打碎成可插拔模块</td><td>Spring AI RetrievalAugmentationAdvisor 里塞 query 改写、多路检索、去重</td></tr>
+    <tr><td><strong>Hybrid Search</strong>「海-布瑞德-瑟奇」</td><td>混合检索</td><td>向量搜不了精确词 → 向量（语义）+ BM25（关键词）+ RRF 融合</td><td>2026 标配，搜 ICCID、套餐编号时 BM25 补精确词</td></tr>
+    <tr><td><strong>Agentic RAG</strong>「阿-真-提克-瑞格」</td><td>智能体 RAG</td><td>单次检索答不了多步问题 → 给 LLM 装「大脑+手脚」自己规划、调工具、验证再答</td><td>「实名失败又充不了值」→ Agent 先查实名文档→再查充值文档→综合回答</td></tr>
+    <tr><td><strong>GraphRAG</strong>「格拉夫-瑞格」</td><td>知识图谱 RAG</td><td>向量检索是「孤岛」不懂实体关系 → 加一层知识图谱做多跳推理（实体丰富查询召回 +72~83%，但延迟 2.3x）</td><td>运营商-联通→提供→套餐-流量王→适用于→设备-5G版（远期方向）</td></tr>
+    <tr><td><strong>Contextual Retrieval</strong>「康-泰克斯-处-瑞-崔沃」</td><td>上下文检索（Anthropic）</td><td>chunk 脱离全文丢上下文 → 入库前给每个 chunk 加「它在全文中的上下文」前缀再向量化，召回率大涨</td><td>《套餐说明》某段单看不知是哪个套餐 → 前缀加「这是 P10 套餐的资费」</td></tr>
+    <tr><td><strong>CRAG / Corrective RAG</strong>「克-瑞克-提夫-瑞格」</td><td>纠错 RAG</td><td>检索质量差直接喂会污染答案 → 先评估检索质量，差就重写 query / 转 Web 搜索再答</td><td>检索到的实名文档相关性低 → 自动改写重查，而非硬答</td></tr>
+    <tr><td><strong>Self-RAG</strong>「赛尔夫-瑞格」</td><td>自反思 RAG</td><td>不是每个问题都需要检索 → 模型自反思「要不要检索 / 检索够不够 / 答案对不对」</td><td>「你好」→ 不检索直接答；「套餐多少钱」→ 触发检索</td></tr>
+    <tr><td><strong>SURE-RAG</strong>「舒尔-瑞格」</td><td>证据充分性 RAG</td><td>传统只要捞回就硬答 → 多一步判断「证据足够吗」，不足主动弃答</td><td>问「下月套餐涨价多少」只检索到旧版 → 主动回「暂无下月调价信息」</td></tr>
+    <tr><td><strong>Bidirectional RAG</strong>「拜-戴-瑞克申诺-瑞格」</td><td>双向 RAG</td><td>知识库静态、模糊问题难答 → ① 反问澄清把模糊问题变精确 ② 高质量问答核查后写回知识库</td><td>「充不了值咋办」→ 反问「是余额不足还是实名失败？」；优质问答自动入库减少人工维护</td></tr>
+    <tr><td><strong>SetR</strong>「赛特-阿」</td><td>集合选择检索</td><td>逐条 ranking 忽略 chunk 间互补 → 直接选「最优 chunk 集合」，多跳问答更准</td><td>「实名+充值」复合问题，一次选齐两类 chunk 而非各排各的</td></tr>
+    <tr><td><strong>RAGAS</strong>「瑞-加斯」</td><td>自动化评估框架</td><td>人工评估慢 → faithfulness/relevancy/recall 自动打分（2026 评估行业标准）</td><td>补充 Spring AI Evaluator，自动化准确率监控</td></tr>
+  </table>
+
+  <div class="h2" id="rag-agent-dev">🤖 项目 Agent 生成（Claude Code / Codex / Cursor）+ Skill 选择</div>
+  <table class="compare-table" style="font-size:0.84rem">
+    <tr><th>工具</th><th>定位</th><th>咔咔快 RAG 怎么用</th></tr>
+    <tr><td><strong>Claude Code（Kiro）</strong></td><td>终端原生 Agent，上下文长、能改多文件+跑命令</td><td>✅ 首选，从 0 搭后台骨架、跨文件改造、Review</td></tr>
+    <tr><td><strong>Codex</strong></td><td>OpenAI 编码 Agent</td><td>补充，单文件/算法片段生成</td></tr>
+    <tr><td><strong>Cursor</strong></td><td>AI 原生 IDE，行内补全+Chat</td><td>日常编辑、小范围重构、即时补全</td></tr>
+  </table>
+  <div class="project-box">
+    <div class="proj-title">开发咔咔快 RAG 客服系统 — Claude Code 实战 5 步</div>
+    <ol>
+      <li><strong>项目初始化：</strong>「帮我创建 Spring Boot 3 + Spring AI + Milvus 的 RAG 知识库后台，package 为 com.kaka.ai，先生成骨架和 pom.xml」</li>
+      <li><strong>分模块生成（每模块独立 Prompt）：</strong>① KnowledgeDocController（上传/删除/列表，存 MySQL，调 IndexService 向量化）② KnowledgeIndexService（Tika 解析，按 docType 选分片策略，写 metadata，存 Milvus）③ RagChatService（App 多选 source 过滤，QA+Memory+SourceTrace Advisor 链）</li>
+      <li><strong>自定义 Skill（让 Claude Code 记住项目约定）：</strong>建 <code>.claude/skills/kaka-rag.md</code>，写明 Milvus collection 名 kaka_faq_vectors；metadata 字段 source/docType/ossUrl/version；filterExpression 单引号格式；防幻觉 System Prompt 模板；三删 @Transactional 要求</li>
+      <li><strong>迭代优化：</strong>「召回率不够，帮我加 RetrievalAugmentationAdvisor + RewriteQueryTransformer，业务领域：随身WiFi实名充值套餐网络」</li>
+      <li><strong>Review 重点：</strong>「检查：三删是否 @Transactional；sources 是否后端权限校验；filterExpression 单引号格式；System Prompt 是否约束 Temperature=0」</li>
+    </ol>
+  </div>
+
+  <div class="h2" id="rag-github">⭐ GitHub 参考项目</div>
+  <ul>
+    <li><strong>spring-projects/spring-ai-examples</strong> — Spring AI 官方示例（Milvus/pgvector/QuestionAnswerAdvisor 完整 demo）</li>
+    <li><strong>alibaba/spring-ai-alibaba</strong> — 阿里百炼 + DashScope Rerank + text-embedding-v3 集成</li>
+    <li><strong>elastic/spring-ai-elasticsearch</strong> — Spring AI + ES BM25 混合检索（2025 官方 demo）</li>
+    <li><strong>infiniflow/ragflow</strong> — 企业级 RAG 完整方案参考（Python，看架构思路即可）</li>
+  </ul>
+</div>
+<!-- ==================== 第 5 部分：面试题 ==================== -->
+<div class="card" id="rag-interview">
+  <div class="card-header"><span class="card-icon">🎤</span><div><div class="card-title">第 5 部分 · 面试题 &amp; 详细答法（咔咔快 + 2026 高频）</div><div class="card-subtitle">三段式 · 每点挂钩实名/充值/套餐/网络</div></div></div>
+  <div class="alert info">💡 <strong>答题模板：</strong>先讲「解决什么业务问题」→ 再说「技术方案是什么（第一性原理 + 项目中怎么做）」→ 最后讲「优化了哪里 / 效果是什么」。</div>
+
+  <div class="h2">Q1：介绍你的 RAG 项目（必问 · 背这段）</div>
+  <div class="highlight-box">
+    <p><strong>解决什么问题：</strong>咔咔快随身 WiFi 平台，用户每天高频咨询实名认证、充值失败、加油包怎么买、网络信号差，人工客服压力大。传统关键词搜索搜不到语义相关内容（「支付没成功」搜不到「充值失败处理」）。</p>
+    <p><strong>怎么做的：</strong>Spring AI + 通义千问 + Milvus。后台运营上传 FAQ 原文件（PDF/Word）→ 阿里云 OSS → Tika 解析 → 按 docType 选分片策略（FAQ 问答对切、套餐 Markdown 标题切）→ text-embedding-v3 向量化 → 存 Milvus。App 端多选知识库文档（metadata filterExpression）→ 检索 Top-3 → 注入 System Prompt → 通义千问流式回答 + 标注来源。FAQ 类走 RAG，查套餐余额/流量走 Tool Calling。</p>
+    <p><strong>优化效果：</strong>覆盖 80%+ 高频咨询，夜间无人客服 99% 自动回复。通过分片策略优化 + threshold 降低（0.8→0.35），召回率从 60% 提升到 90%+。</p>
+  </div>
+
+  <div class="h2">Q2：RAG 和微调（Fine-tuning）怎么选？</div>
+  <div class="highlight-box">
+    <p>RAG 适合数据频繁更新（咔咔快套餐每季度调价，换文档即可，成本极低）且能溯源；微调适合固定风格/领域，更新慢费用高且无法溯源。咔咔快当前只用 RAG，FAQ 迭代快无需微调。两者可结合：RAG 提供最新内容，微调统一输出风格。</p>
+  </div>
+
+  <div class="h2">Q3：向量库为什么选 Milvus？pgvector/Redis/ES 区别？</div>
+  <div class="highlight-box">
+    <p>选型核心是数据量、基础设施、是否需混合检索。Milvus 专业向量库，Spring AI 原生支持，FLAT/HNSW 可切换。pgvector 适合向量&lt;500万且已有 PG。Redis 极快但内存贵，做缓存层。ES 自带 BM25 适合混合搜精确词（ICCID）。咔咔快选 Milvus 因教程链路成熟，后续需混合检索加 ES 双写 RRF 融合即可。</p>
+  </div>
+
+  <div class="h2">Q4：怎么防止 RAG 幻觉？（2026 高频三段式）</div>
+  <div class="highlight-box">
+    <p><strong>两类幻觉：</strong>检索为空瞎编；召回错误 chunk 基于错误材料推理。客服场景零容忍。<strong>三层治理：</strong>① 检索层：分片语义完整 + Metadata 缩范围 + threshold=0.35 + 可选 Rerank；② 生成层：System Prompt 硬约束「无信息回拨 400」，Temperature=0；③ 兜底：allowEmptyContext=FORCE 检索为空直接返回不调大模型。<strong>效果：</strong>套餐价格幻觉从 10% 降到 0，XXL-Job 周跑 RelevancyEvaluator &lt;90% 告警。</p>
+  </div>
+
+  <div class="h2">Q5：Top-K 不够 / 混合检索 / Rerank 具体怎么做？</div>
+  <div class="highlight-box">
+    <p>① MVP：Metadata 多选 + threshold=0.35 + 合理分片；② 混合检索：Milvus 向量 Top10 + ES BM25 Top10，RRF（公式 1/(60+rank) 只看排名不看分数）融合取 Top5；③ Rerank：前两步仍不够时粗筛 topK=20 → DashScopeRerankAdvisor 精排留 3 条。<strong>不要上来就 Rerank</strong>，先把分片和阈值优化好。</p>
+  </div>
+
+  <div class="h2">Q6：Metadata 多选怎么实现？</div>
+  <div class="highlight-box">
+    <p>上传时写 <code>metadata.source=原文件名</code>。App 多选传 List&lt;String&gt; sources，后端构建 <code>FilterExpression = "source in ['实名.pdf','充值.docx']"</code> 放入 SearchRequest。未选则不走 RAG。<strong>后端必须二次 Shiro 权限校验</strong>，防抓包传越权 source。</p>
+  </div>
+
+  <div class="h2">Q7：知识库文档怎么更新？三删一致性？</div>
+  <div class="highlight-box">
+    <p>传错文档 → MySQL 查 chunkIds → Milvus 批量 delete → MySQL 删记录 → OSS 删物理文件，<code>@Transactional(rollbackFor=Exception.class)</code> 保证前三步一致，OSS 删失败异步补偿。套餐调价不直接改，传新版 v2025Q2 多版本共存，App 多选对比，Prompt 引导「以最新版为准」。chunkIds 上传时就存 MySQL。</p>
+  </div>
+
+  <div class="h2">Q8：RAG 准确率怎么评估？</div>
+  <div class="highlight-box">
+    <p>不靠感觉。① RelevancyEvaluator 判断问题-上下文相关性；② FactualityEvaluator 判断幻觉；③ 人工标注 50~100 条「问题→正确 chunkId」算召回率；④ RAGAS 自动评 faithfulness。XXL-Job 周跑 &lt;90% 钉钉告警。低分逐环节反推：先查分片 → 再查阈值 → 再看 Prompt。90% 问题在数据。</p>
+  </div>
+
+  <div class="h2">Q9：Spring AI 的 Advisor 执行顺序？</div>
+  <div class="highlight-box">
+    <p>Advisor 本质 AOP 拦截器，通过 @Order 控制。SourceTraceAdvisor 必须在 QuestionAnswerAdvisor <strong>之后</strong>执行（<code>LOWEST_PRECEDENCE - 1</code>），因为要等它把 chunk 检索出来放到 context 里，才能读 metadata.source 拼到 Prompt。</p>
+  </div>
+
+  <div class="h2">Q10：RAG 和 Tool Calling 怎么配合？意图路由设计？</div>
+  <div class="highlight-box">
+    <p>不是所有问题适合 RAG。「怎么实名」→ RAG；「我的流量还剩多少」→ 查实时数据库。意图分类器判断 FAQ 类（怎么操作、什么是）→ RAG；业务查询类（我的、查、余额）→ Tool Calling 调微服务查 MySQL。两路可同一次对话混用。咔咔快 MVP 用关键词规则（含「我的/查/余额」→ Tool），其余走 RAG。</p>
+  </div>
+
+  <div class="h2">Q11：分片策略怎么选？（核心高频）</div>
+  <div class="highlight-box">
+    <p>chunk 是检索单位，语义不完整材料就错了。默认 800 字会截断套餐说明。FAQ → 对话式一问一块；套餐 → 按 ## 套餐名切；网络故障 → 按故障条目切；长文本 → TokenTextSplitter 保句完整；通用兜底 → RecursiveCharacterTextSplitter。<strong>原则：宁可多切几个小 chunk，不要两主题挤一块。</strong>上线召回率低第一步查分片，比代码优化有效 10 倍。2026 注意：chunk overlap 收益存疑，别盲目堆。</p>
+  </div>
+
+  <div class="h2">Q12：大模型参数 Temperature/TopK/MaxTokens 怎么设？</div>
+  <div class="highlight-box">
+    <p>客服场景：Temperature=0（必须准确不发散）；TopP=0.9（默认，T 为主控）；MaxTokens=500（约 300 字省费）；similarityThreshold=0.35（中文别设 0.8）；topK=3~5（FAQ 够用，Rerank 粗筛设 20）。调参前先把分片和召回优化好，不要用参数掩盖数据质量问题。</p>
+  </div>
+</div>
+<!-- ==================== 第 6 部分：整体汇总记忆树 ==================== -->
+<div class="card" id="rag-memory-tree" style="border-color:var(--accent5)">
+  <div class="card-header"><span class="card-icon">🌳</span><div><div class="card-title">第 6 部分 · 整体汇总记忆树（长期记忆源泉）</div><div class="card-subtitle">真实流程 + 分支 + 踩坑 + 解决技术，把所有知识点串成记忆树</div></div></div>
+  <div class="alert tip">💡 <strong>面试打法：</strong>面试官问「讲讲你的 RAG 项目」，闭眼想象下面这棵树，从头讲到尾——遇到分支讲优化，遇到坑讲解决。这就是和自己做项目、解决问题、调优验证一样的记忆方式。</div>
+  <div class="highlight-box">
+    <strong>🎯 场景：</strong>用户在咔咔快 App 问：「我充错话费了能退吗，还有那个 30 天加油包多少钱？」
+  </div>
+
+  <div class="h2">🔴 阶段一：离线准备阶段（建库）</div>
+  <p>运营上传《充值说明.docx》和《套餐说明.pdf》。</p>
+  <div class="detail-flow">
+    <div class="flow-step" style="border-color:var(--accent3)">OSS 存储<br/><small>传阿里云拿 URL</small></div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step" style="border-color:var(--accent4)">Tika 解析<br/><small>转纯文本</small></div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step" style="border-color:var(--accent2)">智能分片<br/><small>FAQ问答对 / 套餐##标题</small></div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step" style="border-color:var(--accent5)">写 Metadata<br/><small>source/docType</small></div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step" style="border-color:var(--accent2)">向量化入库<br/><small>v3 → Milvus</small></div>
+  </div>
+  <div class="alert warn">⚠️ <strong>踩坑：</strong>一开始用固定 800 字切套餐文档，把「30 天加油包」价格切没了，模型搜不到就编了个。<br/>✅ <strong>解决：</strong>改用 MarkdownHeaderTextSplitter 按 ## 标题切，保证价格和套餐名在一个 chunk 里。<span class="tag">KP3 分片策略</span></div>
+
+  <div class="h2">🔵 阶段二：在线问答阶段（主干流程）</div>
+  <p>用户发消息，进入 CustomerServiceController。</p>
+  <ol>
+    <li><strong>敏感词前置拦截：</strong>本地校验，有违规词直接返回，不消耗 Token <span class="tag">KP17</span></li>
+    <li><strong>记忆注入：</strong>MessageChatMemoryAdvisor 按 userId 取最近 5 轮历史 <span class="tag">KP17</span></li>
+    <li><strong>意图路由（分支点！）：</strong>意图分类器识别出「退款流程」（FAQ 类）+「加油包价格」（聚合查询类）<span class="tag">KP9</span></li>
+  </ol>
+
+  <div class="h2">🟢 分支 A：FAQ 意图走 RAG（退款怎么弄）</div>
+  <div class="step-box">
+    <div class="step-num">1·检索请求</div><p>topK=5, similarityThreshold=0.35 <span class="tag">KP6</span></p>
+  </div>
+  <div class="step-box">
+    <div class="step-num">2·Metadata 过滤</div><p>用户勾选「充值说明」→ <code>source in ['充值说明.docx']</code> <span class="tag">KP7</span></p>
+  </div>
+  <div class="step-box">
+    <div class="step-num">3·向量检索</div>
+    <p>⚠️ <strong>踩坑：</strong>中文口语化「充错话费」搜不到「充值退订政策」。<br/>✅ <strong>解决：</strong>RetrievalAugmentationAdvisor 加 RewriteQueryTransformer 改写为「充值退订政策 套餐退费」再查 <span class="tag">KP11 召回率</span></p>
+  </div>
+  <div class="step-box">
+    <div class="step-num">4·Rerank 精排</div><p>捞回 20 条，DashScopeRerankAdvisor 精排留 3 条 <span class="tag">KP11+ Rerank</span></p>
+  </div>
+  <div class="step-box">
+    <div class="step-num">5·Prompt 注入与生成</div><p>System Prompt 约束「严格基于资料，Temperature=0」；SourceTraceAdvisor 拼 source 标注来源 <span class="tag">KP10/KP12</span></p>
+  </div>
+  <div class="step-box">
+    <div class="step-num">6·流式输出</div><p>.stream().content() 返回 Flux&lt;String&gt;，App 打字机显示 <span class="tag">KP17</span></p>
+  </div>
+
+  <div class="h2">🟣 分支 B：聚合查询走 Tool Calling（30 天加油包多少钱）</div>
+  <div class="flow">
+    <div class="flow-step" style="border-color:var(--accent5)">问题分析<br/><small>「所有价格」散在10个chunk，topK拿不全</small></div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step" style="border-color:var(--accent4)">触发 @Tool<br/><small>PackageQueryTool.getAllPackages()</small></div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step" style="border-color:var(--accent2)">查 MySQL<br/><small>拿精确 JSON 列表</small></div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step" style="border-color:var(--accent3)">LLM 总结<br/><small>「30天版 50元...」</small></div>
+  </div>
+  <p style="color:var(--text3);font-size:0.85rem">为什么不走 RAG？信息散在 10 个 chunk 向量检索 Top5 拿不全，LLM 也不擅长列表统计 → 聚合查询该走数据库 <span class="tag">KP8</span></p>
+
+  <div class="h2">🟡 阶段三：兜底与幻觉防御</div>
+  <p>如果用户问「你们公司股票代码是多少」：</p>
+  <div class="flow">
+    <div class="flow-step" style="border-color:var(--accent3)">检索分数全 &lt;0.35</div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step" style="border-color:var(--accent4)">allowEmptyContext=FORCE 拦截<br/><small>不发给大模型</small></div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step" style="border-color:var(--accent5)">兜底回复<br/><small>「请拨打 400-xxx」</small></div>
+  </div>
+  <p style="color:var(--text3);font-size:0.85rem"><span class="tag">KP10 幻觉治理</span></p>
+
+  <div class="h2">🟠 阶段四：评估与闭环</div>
+  <ol>
+    <li>这个对话被记录到 MongoDB</li>
+    <li>XXL-Job 每周跑 RelevancyEvaluator，判断问题和检索上下文是否相关</li>
+    <li>发现「退款问题」召回率掉到 80% → 钉钉告警</li>
+    <li>运营排查发现新上的「退款手续费」文档没切好 → 手动调整分片，重新索引</li>
+  </ol>
+  <p style="color:var(--text3);font-size:0.85rem"><span class="tag">KP16 准确率评估</span></p>
+
+  <div class="alert success">💡 <strong>面试口诀：</strong>先讲业务痛点 → 两阶段流程（离线建库/在线问答）→ 后台上传+App 多选 → 分片是核心 → Metadata 缩范围 → 防幻觉（检索+Prompt+评估）→ 监控告警。<strong>每个点落到「实名/充值/套餐/网络」四个业务场景。</strong></div>
+</div>
+
+</div>
+<!-- ==================== END 企业级 RAG ==================== -->
+
+<!-- ==================== 智能客服 ==================== -->
+<div id="page-customer-service" class="page">
+<div class="section-title">💬 智能客服系统</div>
+<div class="section-desc">结合你的实战经验 — 从需求到完整架构</div>
+
+<div class="card">
+  <div class="card-header"><span class="card-icon">🏗️</span><div class="card-title">智能客服完整架构</div></div>
+  <div class="highlight-box">
+    <div class="flow" style="flex-wrap:wrap">
+      <div class="flow-step">用户消息</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step">意图识别<br/>Agent</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step">路由分发</div>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:12px">
+      <div class="flow-step">FAQ 类<br/>→ RAG 检索回答</div>
+      <div class="flow-step">业务查询类<br/>→ Tool Calling 查DB</div>
+      <div class="flow-step">投诉/复杂类<br/>→ 转人工客服</div>
+    </div>
+    <div class="flow" style="margin-top:12px">
+      <div class="flow-step">记忆管理<br/>（对话历史）</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step">回复生成<br/>（个性化）</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step">质量过滤<br/>（敏感词）</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step">返回用户</div>
+    </div>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-header"><span class="card-icon">☕</span><div class="card-title">完整代码实现（Spring AI）</div></div>
+  <pre>@Service
+public class CustomerServiceAgent {
+
+    @Autowired ChatClient chatClient;
+    @Autowired VectorStore vectorStore;
+    @Autowired ChatMemory chatMemory;
+    @Autowired OrderQueryTools orderTools;
+
+    public String chat(String userId, String message) {
+        return chatClient.prompt()
+            .system("""
+                你是咔咔快随身WiFi的智能客服。
+                只回答WiFi相关问题，无法解决时引导拨打客服电话。
+                回答简洁，控制在100字以内。
+                """)
+            .advisors(
+                // RAG：自动检索相关知识库
+                new QuestionAnswerAdvisor(vectorStore,
+                    SearchRequest.defaults().withTopK(3)),
+                // 记忆：保留最近10轮对话
+                new MessageChatMemoryAdvisor(
+                    chatMemory, userId, 10)
+            )
+            .tools(orderTools)   // 工具：可查询套餐/流量
+            .user(message)
+            .call()
+            .content();
+    }
+}</pre>
+</div>
+
+<div class="card">
+  <div class="card-header"><span class="card-icon">⚠️</span><div class="card-title">生产注意事项</div></div>
+  <ul>
+    <li><strong>意图识别：</strong>先分类用户意图，FAQ 类走 RAG，业务查询类走 Tool Calling，避免所有请求都走 LLM 推理（成本高）</li>
+    <li><strong>人工兜底：</strong>超过 3 次无法解决的对话，自动转人工，并传递对话历史</li>
+    <li><strong>敏感内容过滤：</strong>输入输出都要过滤，特别是涉及资金的操作</li>
+    <li><strong>响应超时：</strong>流式输出避免用户等待，设置最大等待时间</li>
+    <li><strong>成本监控：</strong>按会话计算 Token 成本，异常流量告警</li>
+  </ul>
+</div>
+</div>
+<!-- ==================== END 智能客服 ==================== -->
+
+<!-- ==================== 面试知识点 ==================== -->
+<div id="page-interview" class="page">
+<div class="section-title">🎤 AI 方向面试知识点</div>
+<div class="section-desc">针对你的背景 — 高频题 + 标准答法</div>
+
+<div class="card">
+  <div class="card-header"><span class="card-icon">❓</span><div class="card-title">高频面试题 & 参考答案</div></div>
+
+  <div class="h2">Q1：说说你对 RAG 的理解，你们是怎么实现的？</div>
+  <div class="highlight-box">
+    <p><strong>答：</strong>RAG 解决 LLM 不了解私有数据的问题——不微调，推理时检索外部知识注入 Prompt。分两阶段：Indexing（解析→分片→Embedding→Milvus）和 Retrieval+Generation（Metadata 过滤→Top-K 检索→拼 Prompt→LLM）。</p>
+    <p>我在项目中用 Spring AI 实现了完整企业级 RAG：Tika 多格式解析、按业务选分片策略、Metadata 知识库隔离、幻觉 Prompt 约束、来源追溯 Advisor。详见本指南「企业级 RAG」章节。</p>
+  </div>
+
+  <div class="h2">Q1.1：企业级 RAG 和 Demo 有什么区别？</div>
+  <div class="highlight-box">
+    <p><strong>答：</strong>Demo 只用默认 TokenTextSplitter + 全局 topK=5；生产级需要：多策略分片+预览、Metadata 隔离、跨 chunk 聚合（Text-to-SQL/分而治之）、幻觉治理、RBAC 权限、版本化更新、量化评估+告警。核心认知：<strong>代码写得好不如数据洗得好</strong>，80% 精度靠分片和 Embedding。</p>
+  </div>
+
+  <div class="h2">Q2：ReAct Agent 的原理是什么？</div>
+  <div class="highlight-box">
+    <p><strong>答：</strong>ReAct = Reasoning + Acting，交替进行推理和行动。每步先输出 Thought（分析当前情况，决定下一步），然后 Action（调用工具），获取 Observation（工具返回结果），再基于结果继续 Thought，循环直到得出 Final Answer。</p>
+    <p>核心价值是「动态决策」——不需要预先规划所有步骤，每步根据最新观察结果灵活调整路径。必须设置最大迭代步数防止死循环。</p>
+  </div>
+
+  <div class="h2">Q3：Spring AI 和 LangChain4j 怎么选？</div>
+  <div class="highlight-box">
+    <p><strong>答：</strong>两者都是 Java AI 框架，选择取决于场景。国内阿里云体系首选 Spring AI Alibaba，与通义千问和 Spring Cloud 生态完美融合，团队学习成本最低。</p>
+    <p>如果需要复杂 Agent 链或者需要切换多家模型提供商，LangChain4j 的 AiServices 声明式接口和 60+ 模型支持更有优势。实际项目中可以组合使用，Spring AI 做微服务集成，LangChain4j 做 Agent 逻辑。</p>
+  </div>
+
+  <div class="h2">Q4：如何防止 LLM 幻觉？RAG 场景怎么答？</div>
+  <div class="highlight-box">
+    <p><strong>答：</strong>RAG 幻觉分两类——<strong>检索为空</strong>：Prompt 约束「查不到就说不知道」+ allowEmptyContext=false；<strong>检索错误</strong>：Garbage In Garbage Out，从分片→Embedding→Metadata 过滤→Rerank 全链路优化。通用层面：Temperature=0、要求引用来源、关键数字后处理验证。</p>
+  </div>
+
+  <div class="h2">Q4.1：RAG 分片策略怎么选？</div>
+  <div class="highlight-box">
+    <p><strong>答：</strong>没有万能策略。表格/花名册按分隔符或行切；技术文档按 Markdown 标题；FAQ 按问答对；通用文本用递归字符分块；长文档用父子 chunk（子检索父送 LLM）。禁止纯固定长度切分。企业级应提供多策略+分片预览让用户选择。</p>
+  </div>
+
+  <div class="h2">Q4.2：知识库文档怎么更新？</div>
+  <div class="highlight-box">
+    <p><strong>答：</strong>传错文件→三表一致删除（DB + vectorStore.delete + OSS）加事务；文档改版→保留旧版，上传新版本（文件名带 v1/v2），对话多选+来源追溯，支持新旧对比。更多 RAG 面试题见「企业级 RAG」章节底部。</p>
+  </div>
+
+  <div class="h2">Q5：你是如何用 AI 提升开发效率的？</div>
+  <div class="highlight-box">
+    <p><strong>答：</strong>我遵循「需求→PRD→验收标准→技术方案→Plan/编码→Review→测试」的 AI 驱动流程。用 Cursor 配合 .cursorrules 约束 AI 生成符合项目规范的代码，大幅减少 Review 成本。复杂功能用 Composer 多文件生成，调试时把错误日志和代码一起贴给 AI 快速定位问题。</p>
+    <p>整体来说，重复性代码（CRUD、DTO 转换、测试用例）效率提升 3-5 倍，主要精力集中在业务逻辑设计和架构决策上。</p>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-header"><span class="card-icon">💡</span><div class="card-title">面试加分项（结合你的简历）</div></div>
+  <ul>
+    <li><strong>RAG 实战：</strong>强调「生产级 RAG」—— 多策略分片、Metadata 隔离、跨 chunk 聚合、Text-to-SQL 路由、Rerank 精排、量化评估，不只是 Demo</li>
+    <li><strong>Cursor Rules：</strong>强调用 .cursorrules 在团队层面统一 AI 生成代码的规范，解决了「AI 代码风格不一致」的问题</li>
+    <li><strong>微服务 → Multi-Agent：</strong>用微服务经验类比 Multi-Agent 架构，展示架构思维的迁移能力</li>
+    <li><strong>支付安全 → AI 安全：</strong>支付幂等、加密安全意识迁移到 AI 应用安全（工具调用权限控制、敏感信息过滤）</li>
+    <li><strong>10年 Java 积累：</strong>强调 Spring AI 是在你熟悉的 Spring 生态上做 AI，不是从零开始，上手快</li>
+  </ul>
+</div>
+
+<div class="card">
+  <div class="card-header"><span class="card-icon">📚</span><div class="card-title">推荐学习资源</div></div>
+  <table class="compare-table">
+    <tr><th>资源</th><th>内容</th><th>优先级</th></tr>
+    <tr><td>吴恩达 DeepLearning.AI</td><td>AI Agent 课程（免费）</td><td><span class="badge">必看</span></td></tr>
+    <tr><td>Spring AI 官方文档</td><td>docs.spring.io/spring-ai</td><td><span class="badge">必看</span></td></tr>
+    <tr><td>LangChain4j 文档</td><td>docs.langchain4j.dev</td><td><span class="badge yellow">推荐</span></td></tr>
+    <tr><td>Spring AI Alibaba GitHub</td><td>示例代码最多</td><td><span class="badge yellow">推荐</span></td></tr>
+    <tr><td>Prompt Engineering Guide</td><td>promptingguide.ai</td><td><span class="badge green">补充</span></td></tr>
+  </table>
+</div>
+</div>
+<!-- ==================== END 面试知识点 ==================== -->
+
+</main>
+</div>
+
+<script>
+function showPage(id) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  const page = document.getElementById('page-' + id);
+  if (page) page.classList.add('active');
+  event.currentTarget.classList.add('active');
+  window.scrollTo(0, 0);
+}
+
+// 技能条动画
+document.addEventListener('DOMContentLoaded', () => {
+  document.querySelectorAll('.skill-fill').forEach(bar => {
+    const w = bar.style.width;
+    bar.style.width = '0';
+    setTimeout(() => { bar.style.width = w; }, 300);
+  });
+});
+</script>
+</body>
+</html>
