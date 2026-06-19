@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git push *)",
+      "Bash(mv \"ai-dev-guide.html\" \"index.html\")",
+      "Bash(git commit *)"
+    ]
+  }
+}
