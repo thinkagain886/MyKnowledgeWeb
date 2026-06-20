@@ -1842,43 +1842,103 @@ public void uploadAndIndex(MultipartFile file, String docType) {
   <div class="card-header"><span class="kp-num">3</span><div><div class="card-title">★ 分片策略（Chunking）</div><div class="card-subtitle">全称：Text Chunking / Document Splitting · 企业 RAG 最关键</div></div></div>
   <div class="alert warn">⚠️ <strong>踩坑：</strong>套餐说明若从中间切断，问「30 天加油包多少钱」可能搜不到完整价格，模型就编一个。代码写得好不如数据洗得好。</div>
   <div class="kp-block kp3">
-    <div class="kp-row"><span class="kp-label">解决问题</span><span>大模型上下文有限，整篇喂进去超 Token 且检索精度极低。</span></div>
-    <div class="kp-row"><span class="kp-label">第一性原理</span><span>检索单位是 chunk。chunk 语义不完整 = 喂给 LLM 的材料是错的 = 回答必然错。</span></div>
-    <div class="kp-row"><span class="kp-label warn">优化点</span><span>
-      <ul style="margin:0;padding-left:16px">
-        <li>禁止纯固定长度切分！FAQ → 对话式分块；套餐 → Markdown 标题切；网络故障 → 按故障条目切</li>
-        <li>后台可提供分片预览，运营确认后再保存，甚至允许手动编辑片段内容</li>
-      </ul>
-    </span></div>
+    <div class="kp-row"><span class="kp-label">解决问题</span><span>大模型单次吞吐上下文（Context）有限，整篇长文档直接喂进去会造成 Token 超限崩溃；且由于「大海捞针」效应，直接检索长文本会导致检索精度（Retrieval Accuracy）极低。</span></div>
+    <div class="kp-row"><span class="kp-label">第一性原理</span><span>大模型 RAG 的检索寻址单位是 Chunk。Chunk 语义不完整 = 喂给 LLM 的推理材料残缺 = 回答必然断章取义或编造。</span></div>
+  </div>
+
+  <div class="h2">核心分片策略矩阵（6 种）</div>
+
+  <div class="step-box"><div class="step-num">1 · 对话式分块（FAQ Splitter）</div>
+    <p><strong>解决问题：</strong>防止「问题」与「答案」被切断分家，导致大模型只看到答案却不知道在回答什么。</p>
+    <p><strong>第一性原理：</strong>问与答（Q&amp;A）是不可分割的最小业务逻辑单元。</p>
+    <p><strong>咔咔快落地：</strong>《常见问题 FAQ.txt》，用特定分隔符（如 <code>---</code> 或正则 <code>Q:</code>）扫描切分。</p>
+  </div>
+
+  <div class="step-box"><div class="step-num">2 · Markdown 标题分块（MarkdownHeaderTextSplitter）</div>
+    <p><strong>解决问题：</strong>防止套餐资费、核心条款、价格数字被拦腰截断，导致大模型拿到孤立的数字。</p>
+    <p><strong>第一性原理：</strong>文档的结构化标题（# / ##）天然承载了其下方正文的宏观语义边界。</p>
+    <p><strong>咔咔快落地：</strong>《套餐与加油包说明.md》，按标题切，利用「元数据下沉」机制，把 # 一级标题变成小 Chunk 的 Metadata 档案，不产生空块，保住资费前因后果。</p>
+  </div>
+
+  <div class="step-box"><div class="step-num">3 · 递归字符分块（RecursiveCharacterSplitter）</div>
+    <p><strong>解决问题：</strong>防止固定长度切分导致排查步骤（步骤 1/2/3）被机械切断，导致大模型给出的指南缺胳膊少腿。</p>
+    <p><strong>第一性原理：</strong>文本的语义连贯性是层层退守的（段落 → 换行 → 句号 → 逗号 → 单字）。能用大刀切好，绝不用小刀剁碎。</p>
+    <p><strong>咔咔快落地：</strong>《网络故障指南.txt》，代码优先找 <code>\n\n</code>（段落），长段落自动内部降级找 <code>。</code> 或 <code>，</code> 切分，确保排查步骤锁在同一个 Chunk。</p>
+  </div>
+
+  <div class="step-box"><div class="step-num">4 · 令牌文本切分（TokenTextSplitter）</div>
+    <p><strong>解决问题：</strong>处理毫无格式、密密麻麻的长篇大论，防止因找不到换行符导致整个大块撑爆大模型输入限制（Token Overflow）。</p>
+    <p><strong>第一性原理：</strong>大模型的吞吐极限是由 Token 数量这个物理铁律决定的。</p>
+    <p><strong>特殊注意：</strong>属于盲目的「滑动窗口」，必须设置重叠区（Overlap）。Overlap 绝不判断语义，纯靠牺牲存储让前后块重复，给切刀边缘的信息买一份「双保险」——仅 TokenTextSplitter 盲切时才需要。</p>
+    <p><strong>咔咔快落地：</strong>未分类长文章，<code>default</code> 兜底策略。</p>
+  </div>
+
+  <div class="step-box"><div class="step-num">5 · 层级/父子分片器（Hierarchical / Parent-Child Splitter）<span class="tag new">新增</span></div>
+    <p><strong>解决问题：</strong>彻底解决「高检索精度（要块小）」与「大模型推理前因后果（要块大）」之间的物理矛盾。</p>
+    <p><strong>第一性原理：</strong>搜索（Search）的最小单位 ≠ 推理（Generation）的最小单位。短文本向量特征明显容易搜，长文本语境饱满大模型容易懂。</p>
+    <p><strong>底层落地：</strong>子分片（~300 字）转成向量，塞入 Milvus，Metadata 带上 <code>parent_id</code>；父分片（~1500 字）纯文本不转向量，存在 Redis 或 MySQL 中。检索时「狸猫换太子」：用户提问 → 命中子分片 → 拦截子分片 → 拿着 parent_id 去 Redis 捞出父分片 → 喂给大模型。</p>
+    <p><strong>咔咔快落地：</strong>《运营商合作跨境结算政策》《咔咔快法务合规合同》。</p>
+  </div>
+
+  <div class="step-box"><div class="step-num">6 · 语义相似度切片器（SemanticSimilaritySplitter）<span class="tag new">新增</span></div>
+    <p><strong>解决问题：</strong>解决作者思维跳跃、没有任何排版、自顾自写的「大杂烩」杂乱长文本。</p>
+    <p><strong>第一性原理：</strong>文字之间的连续向量距离一旦发生骤降，即代表人类思维叙事发生了断裂，此处即为新切片的物理边界。</p>
+    <p><strong>底层落地：</strong>本地调用 Embedding 向量模型（非大模型，成本极低）一句句算相似度。前一句聊「充值相关性 90%」不切，下一句突然跳跃到「吃兰州拉面相关性 10%」，咔嚓一刀切断。</p>
+    <p><strong>咔咔快落地：</strong>无排版杂乱长文本。</p>
+  </div>
+
+  <div class="h2">父子分片检索流程（狸猫换太子）</div>
+  <div class="detail-flow">
+    <div class="flow-step" style="border-color:var(--accent2)">用户提问</div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step" style="border-color:var(--accent5)">命中子分片<br/><small>~300字，Milvus</small></div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step" style="border-color:var(--accent4)">读取 parent_id<br/><small>拦截子分片</small></div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step" style="border-color:var(--accent3)">Redis 捞父分片<br/><small>~1500字</small></div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step" style="border-color:var(--accent)">喂给 LLM<br/><small>语境完整推理</small></div>
+  </div>
+
+  <div class="alert tip">💡 <strong>Overlap 使用原则：</strong>Markdown / FAQ 语义切分已做好 → 不必盲目堆 overlap=50。2026 年 1 月系统分析表明，固定重叠区在语义切分场景下毫无可测收益。仅 TokenTextSplitter 盲切时才需要 Overlap 兜底。</div>
+
+  <div class="kp-block kp3">
     <div class="kp-row"><span class="kp-label tip">2026 新进展</span><span>
       <ul style="margin:0;padding-left:16px">
-        <li><strong>chunk overlap 收益存疑：</strong>2026 年 1 月一项系统分析发现「重叠」这个最常见默认项并无可测收益，别盲目堆 overlap</li>
-        <li><strong>Contextual Retrieval（Anthropic）：</strong>给每个 chunk 前缀加「它在全文中的上下文」再向量化，召回率显著提升</li>
-        <li><strong>Late Chunking：</strong>先整篇过 Embedding 再切，效率高、保留全局语义（与 Contextual Retrieval 是效率 vs 效果的权衡）</li>
+        <li><strong>Overlap 收益存疑：</strong>语义切分已做好则无需堆叠 overlap，别盲目堆砌</li>
+        <li><strong>Contextual Retrieval（Anthropic）：</strong>切好小块后，用大模型给每个小块加工拼接一个全篇摘要前缀再向量化（效果最好、成本偏高）</li>
+        <li><strong>Late Chunking（延迟切分）：</strong>整篇过 Embedding 输出 Token 级向量再按边界切，兼顾全局语义与毫秒级效率（效率 vs 效果的折中选择）</li>
+        <li><strong>人机协同看板：</strong>后台提供分片动态预览，自动高亮资费元素（「元/GB」），允许运营手动干预、合并、二次编辑片段后再增量向量化</li>
       </ul>
     </span></div>
     <div class="project-box">
       <div class="proj-title">📱 咔咔快项目中怎么做</div>
-      <p>上传时根据 <code>docType</code> 选分片器：<code>FAQ</code> 用问答对切；<code>PACKAGE</code> 按 Markdown 二级标题切（每个套餐独立 chunk）；<code>NETWORK</code> 按故障条目切。实名指南按「步骤 1/2/3」切，保证「怎么实名」一次拿全步骤。</p>
+      <p>上传时根据 <code>docType</code> 智能选分片器：<code>FAQ</code> 用 TokenTextSplitter 控制体积极小；<code>PACKAGE</code> 按 Markdown 标题切（元数据下沉，每个套餐独立 chunk）；<code>NETWORK</code> 用显式退守符号链（段落→换行→句号→逗号）递归切；<code>LEGAL</code> / <code>POLICY</code> 类走父子分片（子检索父推理）；杂乱无排版文档考虑语义相似度切片。实名指南按「步骤 1/2/3」切，保证「怎么实名」一次拿全步骤。</p>
     </div>
   </div>
+
   <table class="compare-table" style="font-size:0.84rem">
     <tr><th>策略</th><th>适用</th><th>咔咔快文档</th></tr>
-    <tr><td>对话式分块</td><td>一问一答</td><td>《常见问题 FAQ》</td></tr>
-    <tr><td>Markdown 标题</td><td>按章节切</td><td>《套餐与加油包说明》</td></tr>
-    <tr><td>TokenTextSplitter</td><td>长文章保句完整</td><td>《运营商合作政策》</td></tr>
-    <tr><td>递归字符分块</td><td>通用兜底</td><td>未分类文档默认策略</td></tr>
+    <tr><td>对话式分块</td><td>一问一答</td><td>《常见问题 FAQ.txt》</td></tr>
+    <tr><td>Markdown 标题</td><td>按章节切</td><td>《套餐与加油包说明.md》</td></tr>
+    <tr><td>递归字符分块</td><td>有段落/步骤的指南</td><td>《网络故障指南.txt》</td></tr>
+    <tr><td>TokenTextSplitter</td><td>无格式长文兜底</td><td>未分类长文章（default）</td></tr>
+    <tr><td>父子分片</td><td>搜用小、推理用大</td><td>《运营商合作跨境结算政策》《咔咔快法务合规合同》</td></tr>
+    <tr><td>语义相似度切片</td><td>杂乱无排版长文本</td><td>思维跳跃的大杂烩文档</td></tr>
   </table>
-  <pre>// 【咔咔快】按 docType 选择分片策略
+  <pre>// 【咔咔快】按 docType 智能选择分片策略
 public List&lt;Document&gt; splitByDocType(List&lt;Document&gt; docs, String docType) {
     return switch (docType) {
-        // FAQ：较小 chunk，保证每个问答完整 (chunkSize,overlap,minLen,maxLen,keepSep)
+        // FAQ：令牌文本切分，控制体积极小，强力设置保护红线 5000 防止异常文本导致内存崩溃
         case "FAQ"     -&gt; new TokenTextSplitter(400, 80, 5, 5000, true).apply(docs);
-        // 套餐：按 # / ## 标题切，每个套餐独立 chunk，价格不被切断
+        // 套餐：Markdown 标题切分，元数据下沉，一级标题作为 Metadata 注入子块
         case "PACKAGE" -&gt; new MarkdownHeaderTextSplitter(List.of("#", "##")).apply(docs);
-        // 网络故障：按段落递归切
-        case "NETWORK" -&gt; new RecursiveCharacterTextSplitter("\n\n", 600, 50).apply(docs);
-        default        -&gt; faqSplitter.apply(docs);
+        // 网络故障：递归字符切分，显式符号链「段落→换行→句号→逗号」层层退守
+        // ⚠️ 若只传 "\n\n"，文章没换行将直接退化成硬切，丧失句号断句能力
+        case "NETWORK" -&gt; new RecursiveCharacterTextSplitter(
+            List.of("\n\n", "\n", "。", "，", ""), 600, 50).apply(docs);
+        // 兜底：未分类长文章，Token 硬切保命，确保大模型不爆 Token
+        default        -&gt; defaultTokenSplitter.apply(docs);
     };
 }</pre>
 </div>
@@ -2423,7 +2483,7 @@ public Flux&lt;String&gt; streamChat(Long userId, String msg, SearchRequest sr) 
   <div class="h2">Q1：介绍你的 RAG 项目（必问 · 背这段）</div>
   <div class="highlight-box">
     <p><strong>解决什么问题：</strong>咔咔快随身 WiFi 平台，用户每天高频咨询实名认证、充值失败、加油包怎么买、网络信号差，人工客服压力大。传统关键词搜索搜不到语义相关内容（「支付没成功」搜不到「充值失败处理」）。</p>
-    <p><strong>怎么做的：</strong>Spring AI + 通义千问 + Milvus。后台运营上传 FAQ 原文件（PDF/Word）→ 阿里云 OSS → Tika 解析 → 按 docType 选分片策略（FAQ 问答对切、套餐 Markdown 标题切）→ text-embedding-v3 向量化 → 存 Milvus。App 端多选知识库文档（metadata filterExpression）→ 检索 Top-3 → 注入 System Prompt → 通义千问流式回答 + 标注来源。FAQ 类走 RAG，查套餐余额/流量走 Tool Calling。</p>
+    <p><strong>怎么做的：</strong>Spring AI + 通义千问 + Milvus。后台运营上传 FAQ 原文件（PDF/Word）→ 阿里云 OSS → Tika 解析 → 按 docType 选分片策略（FAQ 问答对切、套餐 Markdown 标题切、长政策/合同类走父子分片「子检索父推理」）→ text-embedding-v3 向量化 → 存 Milvus。App 端多选知识库文档（metadata filterExpression）→ 检索 Top-3 → 注入 System Prompt → 通义千问流式回答 + 标注来源。FAQ 类走 RAG，查套餐余额/流量走 Tool Calling。</p>
     <p><strong>优化效果：</strong>覆盖 80%+ 高频咨询，夜间无人客服 99% 自动回复。通过分片策略优化 + threshold 降低（0.8→0.35），召回率从 60% 提升到 90%+。</p>
   </div>
 
@@ -2474,7 +2534,8 @@ public Flux&lt;String&gt; streamChat(Long userId, String msg, SearchRequest sr) 
 
   <div class="h2">Q11：分片策略怎么选？（核心高频）</div>
   <div class="highlight-box">
-    <p>chunk 是检索单位，语义不完整材料就错了。默认 800 字会截断套餐说明。FAQ → 对话式一问一块；套餐 → 按 ## 套餐名切；网络故障 → 按故障条目切；长文本 → TokenTextSplitter 保句完整；通用兜底 → RecursiveCharacterTextSplitter。<strong>原则：宁可多切几个小 chunk，不要两主题挤一块。</strong>上线召回率低第一步查分片，比代码优化有效 10 倍。2026 注意：chunk overlap 收益存疑，别盲目堆。</p>
+    <p>Chunk 是检索单位，语义不完整 = 材料残缺 = 回答必然错。没有万能策略，按文档类型选：<strong>FAQ → 对话式一问一块</strong>；<strong>套餐/技术文档 → Markdown 标题切</strong>；<strong>故障指南 → 递归字符分块</strong>（段落→句号层层退守）；<strong>无格式长文 → TokenTextSplitter 兜底</strong>；<strong>长政策/合同 → 父子分片</strong>（子分片 ~300 字入 Milvus 检索，父分片 ~1500 字存 Redis 送 LLM，解决「搜用小、推理用大」矛盾）；<strong>杂乱无排版 → 语义相似度切片</strong>（Embedding 算相邻句相似度，骤降处切断）。</p>
+    <p><strong>原则：</strong>宁可多切几个小 chunk，不要两主题挤一块。上线召回率低第一步查分片，比调参有效 10 倍。2026 注意：Markdown/FAQ 语义切分已做好则不必盲目堆 overlap，仅 TokenTextSplitter 盲切才需要 Overlap 兜底。企业级应提供分片预览 + 运营手动合并/编辑后增量向量化。</p>
   </div>
 
   <div class="h2">Q12：大模型参数 Temperature/TopK/MaxTokens 怎么设？</div>
@@ -2497,7 +2558,7 @@ public Flux&lt;String&gt; streamChat(Long userId, String msg, SearchRequest sr) 
     <div class="flow-arrow">→</div>
     <div class="flow-step" style="border-color:var(--accent4)">Tika 解析<br/><small>转纯文本</small></div>
     <div class="flow-arrow">→</div>
-    <div class="flow-step" style="border-color:var(--accent2)">智能分片<br/><small>FAQ问答对 / 套餐##标题</small></div>
+    <div class="flow-step" style="border-color:var(--accent2)">智能分片<br/><small>FAQ问答对 / 套餐##标题 / 父子分片(长政策)</small></div>
     <div class="flow-arrow">→</div>
     <div class="flow-step" style="border-color:var(--accent5)">写 Metadata<br/><small>source/docType</small></div>
     <div class="flow-arrow">→</div>
@@ -2562,7 +2623,7 @@ public Flux&lt;String&gt; streamChat(Long userId, String msg, SearchRequest sr) 
     <li>这个对话被记录到 MongoDB</li>
     <li>XXL-Job 每周跑 RelevancyEvaluator，判断问题和检索上下文是否相关</li>
     <li>发现「退款问题」召回率掉到 80% → 钉钉告警</li>
-    <li>运营排查发现新上的「退款手续费」文档没切好 → 手动调整分片，重新索引</li>
+    <li>运营排查发现新上的「退款手续费」文档没切好 → 后台高亮资费元素、手动合并片段后重新索引</li>
   </ol>
   <p style="color:var(--text3);font-size:0.85rem"><span class="tag">KP16 准确率评估</span></p>
 
@@ -2688,7 +2749,7 @@ public class CustomerServiceAgent {
 
   <div class="h2">Q4.1：RAG 分片策略怎么选？</div>
   <div class="highlight-box">
-    <p><strong>答：</strong>没有万能策略。表格/花名册按分隔符或行切；技术文档按 Markdown 标题；FAQ 按问答对；通用文本用递归字符分块；长文档用父子 chunk（子检索父送 LLM）。禁止纯固定长度切分。企业级应提供多策略+分片预览让用户选择。</p>
+    <p><strong>答：</strong>没有万能策略。FAQ 按问答对切；技术文档/套餐按 Markdown 标题；故障指南用递归字符分块（显式符号链段落→句号→逗号）；无格式长文用 TokenTextSplitter 兜底；长政策/合同用父子 chunk（子检索父送 LLM，解决搜用小推理用大矛盾）；杂乱无排版文档用语义相似度切片（Embedding 算句间相似度骤降处切断）。禁止纯固定长度切分。2026 注意：语义切分已做好不必盲目堆 overlap，仅 Token 盲切才需要。企业级应提供多策略 + 分片动态预览（高亮「元/GB」资费元素）+ 运营手动干预后再增量向量化。</p>
   </div>
 
   <div class="h2">Q4.2：知识库文档怎么更新？</div>
